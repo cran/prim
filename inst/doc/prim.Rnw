@@ -23,7 +23,7 @@ November\or December\fi
 \def\vecY{\vec{Y}}
 
 
-%\VignetteIndexEntry{feature} 
+%\VignetteIndexEntry{prim} 
 
 \title{prim: an R package for Patient Rule Induction Method (PRIM) estimation of highest density regions}
 \author{Tarn Duong \\ Department of Statistics, University of New South Wales \\ Sydney Australia}
