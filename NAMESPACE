@@ -6,11 +6,12 @@ export(prim.combine)
 export(prim.hdr)
 export(prim.thresh.symdiff.mixt)
 export(which.box)
-
+export(plot.prim)
        
 S3method(plot, prim)
 S3method(summary, prim)
 
+              
 ## not exported
 
 ## 

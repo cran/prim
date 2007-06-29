@@ -36,7 +36,6 @@ prim.box <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     if (missing(threshold))
       threshold <- mean(y)
 
-    
     prim.reg <- prim.one(x=x, y=threshold.type*y, box.init=box.init,
                          peel.alpha=peel.alpha,
                          paste.alpha=paste.alpha, mass.min=mass.min[1],
@@ -76,7 +75,8 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   n <- nrow(x)
   k.max <- ceiling(1/mass.min)
   num.boxes <- k.max 
-  
+
+  ##if (is.vector(x)) x <- as.matrix(t(x))
   y.mean <- mean(y)
   mass.init <- length(y)/n 
   
@@ -86,19 +86,22 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     box.init[1,] <- box.init[1,] - 0.1*abs(diff(box.init))
     box.init[2,] <- box.init[2,] + 0.1*abs(diff(box.init))
   }
-
+  
   ## find first box
   k <- 1
   boxk <- find.box(x=x, y=y, box=box.init, peel.alpha=peel.alpha,
                    paste.alpha=paste.alpha, mass.min=mass.min,
                    threshold=mean(y), d=d, n=n,
                    pasting=pasting, verbose=verbose)
-
   if (is.null(boxk))
   {
     if (verbose)
       warning(paste("Unable to find box", k, "\n"))
-    return(list(list(x=x, y=threshold.type*y, y.mean=threshold.type*y.mean, box=box.init, box.mass=mass.init)))
+
+    x.prim <- list(x=list(x), y=list(threshold.type*y), y.mean=threshold.type*y.mean, box=list(box.init), box.mass=mass.init, num.class=1, num.hdr.class=1, threshold=mean(y))
+    class(x.prim) <- "prim"
+    
+    return(x.prim)
   }
   else
   {
@@ -108,7 +111,8 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     boxes <- list(x=list(boxk$x), y=list(boxk$y), y.mean=list(boxk$y.mean),
                   box=list(boxk$box), mass=list(boxk$mass))       
   }
- 
+
+  
   ## find subsequent boxes
   if (num.boxes > 1)
   {
@@ -124,7 +128,9 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     x.out.ind <- apply(x.out.ind.mat, 1, sum)!=0
     
     x.out <- x[x.out.ind,]
+    if (is.vector(x.out)) x.out <- as.matrix(t(x.out)) 
     y.out <- y[x.out.ind]
+    
     box.out <- apply(x.out, 2, range)
    
     while ((k < num.boxes) & (!is.null(boxk))) 
@@ -160,6 +166,7 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
         
         x.out.ind <- x.out.ind & (apply(x.out.ind.mat, 1, sum)!=0)
         x.out <- x[x.out.ind,]
+        if (is.vector(x.out)) x.out <- as.matrix(t(x.out))
         y.out <- y[x.out.ind]
      
         boxes$x[[k]] <- boxk$x
@@ -424,6 +431,9 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=5)
 {
   box.new <- box
   mass <- length(y)/n
+
+  if (is.vector(x)) return(NULL)
+  
   y.mean <- mean(y)
   y.mean.peel <- matrix(0, nrow=2, ncol=d)
   box.vol.peel <- matrix(0, nrow=2, ncol=d) 
@@ -524,7 +534,9 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
   mass <- length(y)/n
   y.mean <- mean(y)
   n.box <- length(y)
-    
+
+  if (is.vector(x)) x <- as.matrix(t(x))
+  
   y.mean.paste <- matrix(0, nrow=2, ncol=d)
   box.vol.paste <- matrix(0, nrow=2, ncol=d)
   box.paste <- matrix(0, nrow=2, ncol=d)
@@ -542,6 +554,8 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
     x.res.ind <- in.box.j(x=x.init, box=box, j=j, d=d, n=nrow(x.init))
     
     x.res <- x.init[x.res.ind,]
+    if (is.vector(x.res)) x.res <- as.matrix(t(x.res))
+    
     y.res <- y.init[x.res.ind]
     x.cand1 <- x.res[x.res[,j] < x.min,j]
     x.cand2 <- x.res[x.res[,j] > x.max,j]
@@ -553,6 +567,7 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
   
     n.paste1 <- ceiling(paste.alpha*n.box)
     x.paste.ind1 <- 1:min(n.paste1, length(x.cand1))
+
     x.paste1 <- c(x[,j], x.cand1[order(x.cand1, decreasing=TRUE)][x.paste.ind1])
     y.paste1 <- c(y, y.cand1[order(x.cand1, decreasing=TRUE)][x.paste.ind1])    
    
@@ -650,13 +665,13 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
 ###############################################################################
 
 
-plot.prim <- function(x, ...)
+plot.prim <- function(x, splom=TRUE, ...)
 {
   if (ncol(x$x[[1]])==2)
     plotprim.2d(x, ...)
-  else if (ncol(x$x[[1]])==3)
+  else if (ncol(x$x[[1]])==3 & !splom)
     plotprim.3d(x, ...)
-  else if (ncol(x$x[[1]])>3)
+  else if (ncol(x$x[[1]])>3 | (ncol(x$x[[1]])==3 & splom))
     plotprim.nd(x, ...)
   
   invisible()
@@ -665,15 +680,15 @@ plot.prim <- function(x, ...)
 plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
    add.legend=FALSE, cex.legend=1, pos.legend, lwd=1, ...)
 { 
-  M <- x$num.hdr.class 
+  M <- x$num.hdr.class
   
   ff <- function(x, d) { return (x[,d]) }
-   
+
   if (missing(xlim))
     xlim <- range(sapply(x$box, ff, 1))
   if (missing(ylim))
     ylim <- range(sapply(x$box, ff, 2))
-
+  
   x.names <- colnames(x$x[[1]])
   if (is.null(x.names)) x.names <- c("x","y")
   
@@ -699,6 +714,7 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
   for (i in M:1)
   {
     ## colour i-th box
+    
     box <- x$box[[i]]
     rect(box[1,1], box[1,2], box[2,1], box[2,2], border=TRUE, col=col[i], lwd=lwd)
   }
@@ -769,7 +785,7 @@ plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, ...)
 {
   M <- x$num.hdr.class
   M2 <- x$num.class
-  
+
   x.names <- colnames(x$x[[1]])
   if (is.null(x.names)) x.names <- c("x","y")
   
@@ -832,7 +848,7 @@ summary.prim <- function(object, ...)
   print(summ.mat)
   
   if (x$num.hdr.class < x$num.class)
-    cat("\n* - box not in HDR at level =", x$threshold,"\n\n")
+    cat("\n* - box not in highest density region at level =", x$threshold,"\n\n")
 
   for (k in 1:M)
   {
@@ -845,6 +861,10 @@ summary.prim <- function(object, ...)
 }
 
 
+############################################################################
+## PRIM threshold tuning parameter
+## Based on k-means clustered normal mixture Monte Carlo approx.
+############################################################################
 
 prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props1, mus2, Sigmas2, props2, weight.dd=1/2, weight.mixt=1/2, nmc=1e6, alpha=0.5, xmc.dd, taumc.dd, gmc.mixt.dd, xmc.mixt, threshold.plus.range, threshold.minus.range, verbose=FALSE)
 {
@@ -866,25 +886,27 @@ prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props
   ## default threshold ranges
   if (missing(threshold.plus.range))
   {
-    if (prim.plus$num.hdr.class >1)
-    {
-      temp.range <- prim.plus$y.mean[1:prim.plus$num.hdr.class]
-      threshold.plus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
-    }
-    else
-      threshold.plus.range <- trunc(prim.plus$y.mean[1]*100)/100
-        
+    ##if (prim.plus$num.hdr.class >1)
+    ##{
+    ##  temp.range <- prim.plus$y.mean[1:prim.plus$num.hdr.class]
+    ##  threshold.plus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
+    ##}
+    ##else
+    ##  threshold.plus.range <- trunc(prim.plus$y.mean[1]*100)/100
+    threshold.plus.range <- sort(prim.plus$y.mean[prim.plus$y.mean>=mean(prim.plus$y.mean)])
+    
   }
   
   if (missing(threshold.minus.range))
   {
-    if (prim.minus$num.hdr.class >1)
-    {
-      temp.range <- prim.minus$y.mean[1:prim.minus$num.hdr.class] 
-      threshold.minus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
-    }
-    else
-      threshold.minus.range <- trunc(prim.minus$y.mean[1]*100)/100
+    ##if (prim.minus$num.hdr.class >1)
+    ##{
+    ##  temp.range <- prim.minus$y.mean[1:prim.minus$num.hdr.class] 
+    ##  threshold.minus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
+    ##}
+    ##else
+    ##  threshold.minus.range <- trunc(prim.minus$y.mean[1]*100)/100
+    threshold.minus.range <- sort(prim.minus$y.mean[prim.minus$y.mean<=mean(prim.minus$y.mean)])
   }
 
   
@@ -906,7 +928,8 @@ prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props
       xinRhat.plus <- xinRhat==1
       symdiff.plus <- (xinR.plus & !xinRhat.plus) | (!xinR.plus & xinRhat.plus)
       i <- i+1
-      err.plus[i] <- mean(symdiff.plus)    
+      err.plus[i] <- mean(symdiff.plus)
+      if (verbose) print(c(thp, err.plus[i]))  
     }
     
     thresh.plus <- rev(threshold.plus.range)[which.min(rev(err.plus))]
@@ -922,7 +945,7 @@ prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props
     for (thm in threshold.minus.range)
     {
       prim.minus.hdr <- prim.hdr(prim=prim.minus, threshold=thm, threshold.type=-1)
-
+      
       if (!is.null(prim.minus.hdr))
       {
         xmc.mixt.class <- which.box(x=xmc.mixt, box.seq=prim.minus.hdr)
@@ -939,6 +962,7 @@ prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props
         i <- i+1
         err.minus[i] <- 1
       }
+      if (verbose) print(c(thm, err.minus[i]))
     }
   
     thresh.minus <- threshold.minus.range[which.min(err.minus)]

@@ -130,7 +130,7 @@ which.box <- function(x, box.seq)
   
   x.ind <- rep(TRUE, n)
   x.which.box <- rep(0,n)
-  
+
   for (k in 1:m)
   {
     x.ind.curr <- x.ind    

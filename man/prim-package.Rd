@@ -8,9 +8,7 @@ Patient Rule Induction Method (PRIM)
 }
 
 \description{
-  PRIM for estimating highest density regions (HDR) for high-dimensional
-  regression-type data.   
-  
+  PRIM for bump-hunting for high-dimensional regression-type data.   
 }
 
 \details{
@@ -20,12 +18,13 @@ Patient Rule Induction Method (PRIM)
   scalar response. We wish to find the modal (and/or anti-modal) regions
   in the conditional 
   expectation \eqn{ m(\bold{x}) = \bold{E} (Y | \bold{x}).}{m(x) = E(Y | x).}  
-  These regions are also known as the highest density regions (HDR).
+  %These regions are also known as the highest density regions (HDR).
   
   PRIM is a bump-hunting technique introduced by Friedman \& Fisher
   (1999), taken from data mining.
-  PRIM estimates are a sequence of nested hyper-rectangles (boxes). The
-  boxes which exceed a threshold comprise the HDR estimate. 
+  PRIM estimates are a sequence of nested hyper-rectangles (boxes).
+  %The
+  %boxes which exceed a threshold comprise the HDR estimate. 
 
   For an overview of this package, see \code{vignette("prim")} for PRIM
   estimation for 2- and 5-dimensional data. 

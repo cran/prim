@@ -6,8 +6,8 @@
 
 \title{PRIM for multivariate data}
 \description{
-  PRIM for multivariate data. Result is an estimate of the highest
-  density region (HDR).
+  PRIM for multivariate data.
+  %Result is an estimate of the highest density region (HDR).
 }
 \usage{
 prim.box(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
@@ -26,8 +26,8 @@ prim.combine(prim1, prim2)
   \item{paste.alpha}{pasting quantile tuning parameter}
   \item{mass.min}{minimum mass tuning parameter}
   \item{threshold}{threshold tuning parameter(s)} 
-  \item{threshold.type}{1 = positive HDR, -1 = negative HDR, 0
-    = both HDR}
+  \item{threshold.type}{threshold direction indicator: 1 = ">=
+    threshold", -1 = "<= threshold", 0 = ">= threshold[1] & <= threshold[2]"}
   \item{pasting}{flag for pasting}
   \item{verbose}{flag for printing output during execution}
   \item{prim,prim1,prim2}{objects of type \code{prim}}
@@ -38,9 +38,9 @@ prim.combine(prim1, prim2)
 \details{
   The data are \eqn{(\bold{X}_1, Y_1), \dots, (\bold{X}_n, Y_n)}{(X_1, Y_1), \ldots,
     (X_n, Y_n)}  where \eqn{\bold{X}_i}{X_i} is d-dimensional and \eqn{Y_i}{Y_i} is a
-  scalar response. PRIM finds modal (and/or anti-modal) regions in the conditional
-  expectation \eqn{ m(\bold{x}) = \bold{E} (Y | \bold{x}).}{m(x) = E(Y | x).} 
-  These regions are also called the highest density regions (HDR). 
+  scalar response. PRIM finds modal (and/or anti-modal) regions in the
+  conditional expectation \eqn{m(\bold{x}) = \bold{E} (Y | \bold{x}).}{m(x) = E(Y | x).} 
+  %These regions are also called the highest density regions (HDR). 
 
   In general, \eqn{Y_i}{Y_i} can be real-valued. See
   \code{vignette("prim")}.
@@ -61,39 +61,32 @@ prim.combine(prim1, prim2)
   \code{paste.alpha} and \code{mass.min} are taken from Friedman \&
   Fisher (1999).
 
-  Specifying the type of HDR is controlled by \code{threshold} and
+  The type of PRIM estimate is controlled \code{threshold} and
   \code{threshold.type}:
   \itemize{
-    \item{}{For \code{threshold.type=1}, then we search for
-      positive HDR \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold}\}.}
+    \item{}{For \code{threshold.type=1}, we search for \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold}\}.}
     
-    \item{}{For \code{threshold.type=-1}, then we search for negative HDR
-      \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold}\}.}
+    \item{}{For \code{threshold.type=-1}, we search for \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold}\}.}
       
-    \item{}{For \code{threshold.type=0}, then we search for both the positive and
-      negative HDR. In this case make sure that \code{threshold} is
-      (positive HDR threshold, negative HDR threshold).}
+    \item{}{For \code{threshold.type=0}, we search for both \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold[1]}\} and \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold[2]}\}.}
   }
 
   There are two ways of using PRIM. One is \code{prim.box} with
-  pre-specified threshold(s). This is  
-  appropriate when the threshold(s) are known to produce good estimates.
+  pre-specified threshold(s). This is appropriate when the threshold(s)
+  are known to produce good estimates. 
 
-  On the other hand, if the user doesn't provide
-  threshold values then \code{prim.box} computes box
-  sequences which cover the data range. These can then be pruned into
-  HDRs. \code{prim.hdr}
+  On the other hand, if the user doesn't provide threshold values then
+  \code{prim.box} computes box sequences which cover the data
+  range. These can then be pruned at a later stage. \code{prim.hdr}
   allows the user to specify many different threshold values in an
   efficient manner, without having to recomputing the entire PRIM box
-  sequence. \code{prim.combine} can be used to 
-  join the separate positive and negative HDR computed from
-  \code{prim.hdr}. See the examples below.
+  sequence. \code{prim.combine} can be used to join the regions computed
+  from \code{prim.hdr}. See the examples below. 
 }
 
 \value{
-  -- \code{prim.box} produces a PRIM estimate of HDRs, an object of
-  type \code{prim}, which is a 
-  list with 8 fields:
+  -- \code{prim.box} produces a PRIM estimate, an object of
+  type \code{prim}, which is a list with 8 fields:
   
   \item{x}{list of data matrices}
   \item{y}{list of response variable vectors}
@@ -104,19 +97,17 @@ prim.combine(prim1, prim2)
     a box)}
   \item{num.class}{total number of PRIM boxes}
   \item{num.hdr.class}{total number of PRIM boxes which form the HDR}
-  \item{ind}{HDR indicator: 1 = positive HDR, -1 = negative HDR}
+  \item{ind}{threshold direction indicator: 1 = ">= threshold", -1 = "<=threshold"}
 
   The above lists have \code{num.class} fields, one for each box.
 
-  -- \code{prim.hdr} takes a \code{prim} object and computes HDRs with
+  -- \code{prim.hdr} takes a \code{prim} object and prunes it using 
   different threshold values. Returns another \code{prim} object. This
-  is much
-  faster for experimenting with different threshold values than calling
-  \code{prim.box} each time. 
+  is much faster for experimenting with different threshold values than
+  calling \code{prim.box} each time. 
 
   -- \code{prim.combine} combines two \code{prim} objects into a single
-  prim object. Useful for combining positive and negative HDRs. Usually
-  used in conjunction with \code{prim.hdr}. See examples below.
+  prim object. Usually used in conjunction with \code{prim.hdr}. See examples below.
 }
 
 \references{

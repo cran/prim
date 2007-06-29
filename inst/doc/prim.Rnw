@@ -22,10 +22,12 @@ November\or December\fi
 \def\vecX{\vec{X}}
 \def\vecY{\vec{Y}}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Change this for a different vignette
 %\VignetteIndexEntry{prim} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{prim: an R package for Patient Rule Induction Method (PRIM) estimation of highest density regions}
+\title{prim: an R package for Patient Rule Induction Method (PRIM) estimation of highest density difference regions}
 \author{Tarn Duong \\ Department of Statistics, University of New South Wales \\ Sydney Australia}
 
 
@@ -47,7 +49,7 @@ We are interested in the conditional expectation function
 $$
 m(\vecx) = \E (Y | \vecx).    
 $$
-In the case where we have 1 sample then PRIM
+In the case where we have a single sample then PRIM
 finds regions which correspond to the modal regions of $m(\vecx)$. 
 These regions are closely related to the highest density regions (HDR) of 
 \citet*{hyndman96}, defined in the form, for some threshold $\tau$,
@@ -61,7 +63,7 @@ $$Y_i = \begin{cases} 1 & \mathrm{if} \ \vecX_i \ \mathrm{is \ from \ sample\ 1}
 $$
 Then PRIM finds the regions where the samples are most different. 
 Here we have a positive HDR (where sample 1 points dominate)
-and a negative HDR (where sample 1 points dominate).
+and a negative HDR (where sample 2 points dominate).
 
  
 
@@ -112,7 +114,7 @@ This regions comprises the bulk
 of the high crime areas, and is described in terms of 
 nitrogen oxides levels in $[0.5341, 0.7400]$ 
 and average number of rooms in $[3.0391, 7.0691]$.
-The other 52.11\% of the
+The other 57.11\% of the
 towns have an average crime rate of 0.6036.
 
 <<>>=

@@ -6,7 +6,7 @@
   PRIM plot for multivariate data.
 }
 
-\synopsis{\method{plot}{prim}(x, ...)}
+\synopsis{\method{plot}{prim}(x, splom=TRUE, ...)}
 
 \usage{
 ## bivariate
@@ -23,6 +23,8 @@
 
 \arguments{
   \item{x}{an object of class \code{prim}}
+  %\item{splom}{flag for plotting 3-d data as scatter plot matrix or 3-d
+  %  RGL plot. Default is TRUE (scatter plot matrix).}
   \item{add.legend}{flag for adding legend (2-d plot)}
   \item{pos.legend}{(x,y) co-ordinates for leaned (2-d plot)}
   \item{cex.legend}{cex graphics parameter for legend (2-d plot)}
