@@ -1,30 +1,4 @@
-###############################################################################
-## Find all data points x which satisfy constraints defined
-## by box - excluding the j-th dim (pasting dim).
-##
-## Parameters
-##
-## x - data matrix
-## box - matrix of limits for 1 box
-## j - pasting dimension
-## d - dimension of data
-## n - number of data
-##
-## Returns
-## Logical vector of length n where TRUE indicates that data point
-## is available for pasting in j-th dim.
-###############################################################################
 
-in.box.j <- function(x, box, j, d, n)
-{
-  dims <- (1:d)[-j]
-  x.index <- rep(TRUE, n)
-  
-  for (k in dims)
-    x.index <- x.index & (x[,k] >= box[1,k]) & (x[,k] <= box[2,k]) 
- 
-  return(x.index) 
-}
 
 ####################################################################
 ### Find points of x that are in a single box
@@ -38,13 +12,16 @@ in.box.j <- function(x, box, j, d, n)
 ### Data points which lie within the box
 ####################################################################
 
-in.box <- function(x, box, d)
+in.box <- function(x, box, d, boolean=FALSE)
 {
   x.box.ind <- rep(TRUE, nrow(x)) 
   for (i in 1:d)
      x.box.ind <- x.box.ind & (box[1,i] <= x[,i]) & (x[,i] <= box[2,i])
 
-  return(x[x.box.ind,])
+  if (boolean)
+    return(x.box.ind)
+  else  
+    return(x[x.box.ind,])
 }
 
 
@@ -141,7 +118,7 @@ which.box <- function(x, box.seq)
     
     x.which.box[x.ind.curr & x.ind] <- k  
    
-    ## exclude those in in current box (x.ind.curr) for the next iteration
+    ## exclude those in current box (x.ind.curr) for the next iteration
     x.ind <- x.ind & !x.ind.curr
   }
   

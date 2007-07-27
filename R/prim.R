@@ -36,9 +36,9 @@ prim.box <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     if (missing(threshold))
       threshold <- mean(y)
 
-    prim.reg <- prim.one(x=x, y=threshold.type*y, box.init=box.init,
+    prim.temp <- prim.one(x=x, y=threshold.type*y, box.init=box.init,
                          peel.alpha=peel.alpha,
-                         paste.alpha=paste.alpha, mass.min=mass.min[1],
+                         paste.alpha=paste.alpha, mass.min=mass.min,
                          threshold.type=threshold.type, 
                          threshold=threshold[1], pasting=pasting,
                          verbose=verbose)
@@ -51,24 +51,36 @@ prim.box <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
       if (length(threshold)==1)
         stop("Need both upper and lower values for threshold")
       
-    prim.plus <- prim.one(x=x, y=y, box.init=box.init, peel.alpha=peel.alpha,
-                          paste.alpha=paste.alpha, mass.min=mass.min,
-                          threshold.type=1,
-                          threshold=threshold[1], pasting=pasting, verbose=verbose)
-    prim.minus <- prim.one(x=x, y=-y, box.init=box.init, peel.alpha=peel.alpha,
-                           paste.alpha=paste.alpha,mass.min=mass.min,
-                           threshold.type=-1,
-                           threshold=threshold[2], pasting=pasting, verbose=verbose)
-    prim.reg <- prim.combine(prim.plus, prim.minus)
-  }
-
-  return(prim.reg)
+    prim.pos <- prim.one(x=x, y=y, box.init=box.init, peel.alpha=peel.alpha,
+                         paste.alpha=paste.alpha, mass.min=mass.min,
+                         threshold.type=1, threshold=threshold[1],
+                         pasting=pasting, verbose=verbose)
+    prim.neg <- prim.one(x=x, y=-y, box.init=box.init, peel.alpha=peel.alpha,
+                         paste.alpha=paste.alpha,mass.min=mass.min,
+                         threshold.type=-1, threshold=threshold[2],
+                         pasting=pasting, verbose=verbose)
+    prim.temp <- prim.combine(prim.pos, prim.neg)
     
+  }
+  
+  ## re-do prim to ensure that no data points are missed from the `dump' box 
+  prim.reg <- prim.temp
+  prim.labels <- which.box(x=x, box.seq=prim.reg)
+  for (k in 1:prim.reg$num.class)
+  {
+    primk.ind <- which(prim.labels==k)
+    prim.reg$x[[k]] <- x[primk.ind,]
+    prim.reg$y[[k]] <- y[primk.ind]
+    prim.reg$y.mean[k] <- mean(prim.reg$y[[k]])
+    prim.reg$mass[k] <- length(prim.reg$y[[k]])/nrow(x)
+  }
+  
+  return(prim.reg)
 }
 
 
 prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
-                     mass.min=0.05, threshold, pasting=TRUE, threshold.type=1,
+                     mass.min=0.05, threshold, pasting=FALSE, threshold.type=1,
                      verbose=FALSE)
 {
   d <- ncol(x)
@@ -76,23 +88,25 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   k.max <- ceiling(1/mass.min)
   num.boxes <- k.max 
 
+ 
   ##if (is.vector(x)) x <- as.matrix(t(x))
   y.mean <- mean(y)
   mass.init <- length(y)/n 
   
   if (is.null(box.init))
-  {   
+  {
     box.init <- apply(x, 2, range)
-    box.init[1,] <- box.init[1,] - 0.1*abs(diff(box.init))
-    box.init[2,] <- box.init[2,] + 0.1*abs(diff(box.init))
+    box.diff <- box.init[2,] - box.init[1,]
+    box.init[1,] <- box.init[1,] - 0.1*box.diff
+    box.init[2,] <- box.init[2,] + 0.1*box.diff
   }
   
   ## find first box
   k <- 1
   boxk <- find.box(x=x, y=y, box=box.init, peel.alpha=peel.alpha,
                    paste.alpha=paste.alpha, mass.min=mass.min,
-                   threshold=mean(y), d=d, n=n,
-                   pasting=pasting, verbose=verbose)
+                   threshold=mean(y), d=d, n=n, pasting=pasting, verbose=verbose)
+
   if (is.null(boxk))
   {
     if (verbose)
@@ -106,8 +120,7 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   else
   {
     if (verbose)
-      cat(paste("Found find box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4), ", mass=",
-                signif(boxk$mass,4), "\n\n", sep=""))
+      cat(paste("Found find box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4), ", mass=", signif(boxk$mass,4), "\n\n", sep=""))
     boxes <- list(x=list(boxk$x), y=list(boxk$y), y.mean=list(boxk$y.mean),
                   box=list(boxk$box), mass=list(boxk$mass))       
   }
@@ -118,10 +131,9 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   {
     boxk <- list(x=boxes$x[[k]], y=boxes$y[[k]], y.mean=boxes$y.mean[[k]],
                  box=boxes$box[[k]], mass=boxes$mass[[k]])
+
     ## data still under consideration
-    
     x.out.ind.mat <-  matrix(TRUE, nrow=nrow(x), ncol=ncol(x))
-   
     for (j in 1:d)
       x.out.ind.mat[,j] <- (x[,j] < boxk$box[1,j]) | (x[,j] > boxk$box[2,j])
 
@@ -131,17 +143,16 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     if (is.vector(x.out)) x.out <- as.matrix(t(x.out)) 
     y.out <- y[x.out.ind]
     
-    box.out <- apply(x.out, 2, range)
-   
+    ##box.out <- apply(x.out, 2, range)
     while ((k < num.boxes) & (!is.null(boxk))) 
     {
       k <- k+1
 
-      boxk <- find.box(x=x.out, y=y.out, box=box.out,
+      boxk <- find.box(x=x.out, y=y.out, box=box.init,
                        peel.alpha=peel.alpha, paste.alpha=paste.alpha,
                        mass.min=mass.min, threshold=min(y), d=d, n=n,
                        pasting=pasting, verbose=verbose)
-      
+
       if (is.null(boxk))
       {
         if (verbose)
@@ -178,6 +189,7 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     }   
   }
 
+ 
   ## adjust for negative hdr  
   for (k in 1:length(boxes$y.mean))
   {
@@ -203,10 +215,10 @@ prim.hdr <- function(prim, threshold, threshold.type)
   for (i in 1:length(prim$box))
     n <- n + length(prim$y[[i]])
 
-  excess.ind <- which(unlist(prim$y.mean)*threshold.type >= threshold*threshold.type)
+  hdr.ind <- which(unlist(prim$y.mean)*threshold.type >= threshold*threshold.type)
 
-  if (length(excess.ind) > 0)
-    excess.ind <- max(excess.ind)
+  if (length(hdr.ind) > 0)
+    hdr.ind <- max(hdr.ind)
   else
   {
     if (threshold.type==1)
@@ -219,7 +231,7 @@ prim.hdr <- function(prim, threshold, threshold.type)
   ## highest density region  
   x.prim.hdr <- list()
   
-  for (k in 1:excess.ind)
+  for (k in 1:hdr.ind)
   {
     x.prim.hdr$x[[k]] <- prim$x[[k]]
     x.prim.hdr$y[[k]] <- prim$y[[k]]
@@ -228,26 +240,26 @@ prim.hdr <- function(prim, threshold, threshold.type)
     x.prim.hdr$mass[[k]] <-prim$mass[[k]] 
   }
   
-  ## combine non-excess into a `dump' box
-  if (excess.ind < length(prim$x))
+  ## combine non-hdr into a `dump' box
+  if (hdr.ind < length(prim$x))
   {
     x.temp <- numeric()
     y.temp <- numeric()
-    for (k in (excess.ind+1):length(prim$x))
+    for (k in (hdr.ind+1):length(prim$x))
     {
       x.temp <- rbind(x.temp, prim$x[[k]])
       y.temp <- c(y.temp, prim$y[[k]])
     }
     
-    x.prim.hdr$x[[excess.ind+1]] <- x.temp
-    x.prim.hdr$y[[excess.ind+1]] <- y.temp
-    x.prim.hdr$y.mean[[excess.ind+1]] <- mean(y.temp)
-    x.prim.hdr$box[[excess.ind+1]] <- prim$box[[length(prim$x)]]
-    x.prim.hdr$mass[[excess.ind+1]] <- length(y.temp)/n  
-    }
+    x.prim.hdr$x[[hdr.ind+1]] <- x.temp
+    x.prim.hdr$y[[hdr.ind+1]] <- y.temp
+    x.prim.hdr$y.mean[[hdr.ind+1]] <- mean(y.temp)
+    x.prim.hdr$box[[hdr.ind+1]] <- prim$box[[length(prim$x)]]
+    x.prim.hdr$mass[[hdr.ind+1]] <- length(y.temp)/n  
+  }
   
   x.prim.hdr$num.class <- length(x.prim.hdr$x)
-  x.prim.hdr$num.hdr.class <- excess.ind
+  x.prim.hdr$num.hdr.class <- hdr.ind
   x.prim.hdr$threshold <- threshold
   
   x.prim.hdr$ind <- rep(threshold.type, x.prim.hdr$num.hdr.class)
@@ -357,6 +369,7 @@ prim.combine <- function(prim1, prim2)
 ## box - box limits
 ## mass - box mass
 ###############################################################################
+
 find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold,
                      d, n, pasting, verbose) 
 {
@@ -365,7 +378,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold,
   
   if ((y.mean >= threshold) & (mass >= mass.min))
     boxk.peel <- peel.one(x=x, y=y, box=box, peel.alpha=peel.alpha,
-                           mass.min=mass.min,threshold=threshold, d=d, n=n)   
+                          mass.min=mass.min,threshold=threshold, d=d, n=n)   
   else
     boxk.peel <- NULL
 
@@ -375,8 +388,8 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold,
   { 
     boxk.temp <- boxk.peel
     boxk.peel <- peel.one(x=boxk.temp$x, y=boxk.temp$y, box=boxk.temp$box,
-                           peel.alpha=peel.alpha,
-                           mass.min=mass.min, threshold=threshold, d=d, n=n)
+                          peel.alpha=peel.alpha,
+                          mass.min=mass.min, threshold=threshold, d=d, n=n)
   }
   
   if (verbose)
@@ -442,14 +455,21 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=5)
   {
     box.min.new <- quantile(x[,j], peel.alpha, type=type)
     box.max.new <- quantile(x[,j], 1-peel.alpha, type=type)
-    
+
     y.mean.peel[1,j] <- mean(y[x[,j] >= box.min.new])
     y.mean.peel[2,j] <- mean(y[x[,j] <= box.max.new])
-    
+
+   
     box.temp1 <- box
     box.temp2 <- box
     box.temp1[1,j] <- box.min.new
     box.temp2[2,j] <- box.max.new
+    #if (box.temp2[2,3] < 0.904 & box.temp2[2,3] > 0.903)
+    #  {print(box.temp1)
+    #   print(box.temp2)
+    #   print(y.mean.peel)
+    #   browser()
+    # }
     box.vol.peel[1,j] <- vol.box(box.temp1)
     box.vol.peel[2,j] <- vol.box(box.temp2)    
   }
@@ -492,7 +512,7 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=5)
   y.new <- y[x.index]
   mass.new <- length(y.new)/n
   y.mean.new <- mean(y.new)
-  
+
   ## if min. y mean and min. mass conditions are still true, update
   ## o/w return NULL  
 
@@ -535,10 +555,12 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
   y.mean <- mean(y)
   n.box <- length(y)
 
+  box.init <- apply(x.init, 2, range)
+  
   if (is.vector(x)) x <- as.matrix(t(x))
   
   y.mean.paste <- matrix(0, nrow=2, ncol=d)
-  box.vol.paste <- matrix(0, nrow=2, ncol=d)
+  mass.paste <- matrix(0, nrow=2, ncol=d)
   box.paste <- matrix(0, nrow=2, ncol=d)
   x.paste1.list <- list()
   x.paste2.list <- list()
@@ -547,103 +569,67 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
 
   for (j in 1:d)
   {    
-    x.min <- min(x[,j])
-    x.max <- max(x[,j])
-
     ## candidates for pasting
-    x.res.ind <- in.box.j(x=x.init, box=box, j=j, d=d, n=nrow(x.init))
+    box.diff <- (box.init[2,] - box.init[1,])[j]
+    box.paste1 <- box
+    box.paste2 <- box
+    box.paste1[1,j] <- box[1,j] - box.diff*paste.alpha
+    box.paste2[2,j] <- box[2,j] + box.diff*paste.alpha
     
-    x.res <- x.init[x.res.ind,]
-    if (is.vector(x.res)) x.res <- as.matrix(t(x.res))
+    x.paste1.ind <- in.box(x=x.init, box=box.paste1, d=d, boolean=TRUE)
+    x.paste1 <- x.init[x.paste1.ind,]
+    y.paste1 <- y.init[x.paste1.ind]
     
-    y.res <- y.init[x.res.ind]
-    x.cand1 <- x.res[x.res[,j] < x.min,j]
-    x.cand2 <- x.res[x.res[,j] > x.max,j]
-    y.cand1 <- y.res[x.res[,j] < x.min]
-    y.cand2 <- y.res[x.res[,j] > x.max]
+    x.paste2.ind <- in.box(x=x.init, box=box.paste2, d=d, boolean=TRUE)
+    x.paste2 <- x.init[x.paste2.ind,]
+    y.paste2 <- y.init[x.paste2.ind]
     
-    ## paste below minimum
-    k <- 1
-  
-    n.paste1 <- ceiling(paste.alpha*n.box)
-    x.paste.ind1 <- 1:min(n.paste1, length(x.cand1))
-
-    x.paste1 <- c(x[,j], x.cand1[order(x.cand1, decreasing=TRUE)][x.paste.ind1])
-    y.paste1 <- c(y, y.cand1[order(x.cand1, decreasing=TRUE)][x.paste.ind1])    
-   
-    x.paste1 <- na.omit(x.paste1)
-    y.paste1 <- na.omit(y.paste1)
-    x.paste1.list[[j]] <- x.paste1
-    y.paste1.list[[j]] <- y.paste1
-    
-    ## paste above maximum
-    k <- 1
-    
-    n.paste2 <- ceiling(paste.alpha*n.box)
-    x.paste.ind2 <- 1:min(n.paste2, length(x.cand2))
-    x.paste2 <- c(x[,j], x.cand2[order(x.cand2)][x.paste.ind2])
-    y.paste2 <- c(y, y.cand2[order(x.cand2)][x.paste.ind2])
-    
-    x.paste2 <- na.omit(x.paste2)
-    y.paste2 <- na.omit(y.paste2)
-    x.paste2.list[[j]] <- x.paste2
-    y.paste2.list[[j]] <- y.paste2
-
     ## y means of pasted boxes
     y.mean.paste[1,j] <- mean(y.paste1)
     y.mean.paste[2,j] <- mean(y.paste2)
 
-    box.temp1 <- box
-    box.temp2 <- box
-    box.temp1[1,j] <- min(x.paste1)
-    box.temp2[2,j] <- max(x.paste2)
-
-    ## volume of pasted boxes
-    box.vol.paste[1,j] <- vol.box(box.temp1)
-    box.vol.paste[2,j] <- vol.box(box.temp2)
-
-    ## limits of pasted boxes
-    box.paste[1,j] <- min(x.paste1) 
-    box.paste[2,j] <- max(x.paste2)
+    ## mass of pasted boxes
+    mass.paste[1,j] <- length(y.paste1)/n
+    mass.paste[2,j] <- length(y.paste2)/n
+    
+    x.paste1.list[[j]] <- x.paste1
+    y.paste1.list[[j]] <- y.paste1
+    x.paste2.list[[j]] <- x.paste2
+    y.paste2.list[[j]] <- y.paste2
+    box.paste[1,j] <- box.paste1[1,j]
+    box.paste[2,j] <- box.paste2[2,j]
   }
-  
-  y.mean.paste.max.ind <- which(y.mean.paste==max(y.mean.paste), arr.ind=TRUE)
-  
-  ## break ties by choosing box with largest volume
 
-  nrr <- nrow(y.mean.paste.max.ind) 
-  if (nrr > 1)
+  ## break ties by choosing box with largest mass
+  
+  y.mean.paste.max <- which(y.mean.paste==max(y.mean.paste), arr.ind=TRUE)
+  
+  if (nrow(y.mean.paste.max)>1)
   {
-    box.vol.paste2 <- rep(0, nrr)
-    for (j in 1:nrr)
-      box.vol.paste2[j] <- box.vol.paste[y.mean.paste.max.ind[j,1],
-                                         y.mean.paste.max.ind[j,2]]
-    row.ind <- which(max(box.vol.paste2)==box.vol.paste2)
+     y.mean.paste.max <- cbind(y.mean.paste.max, mass.paste[y.mean.paste.max])
+     y.mean.paste.max.ind <- y.mean.paste.max[order(y.mean.paste.max[,3], decreasing=TRUE),][1,1:2]
   }
   else
-    row.ind <- 1
+    y.mean.paste.max.ind <- as.vector(y.mean.paste.max)       
   
-  y.mean.paste.max.ind <- y.mean.paste.max.ind[row.ind,]
-
-  ## paste along dimension jmax
+  ## paste along dimension j.max
   j.max <- y.mean.paste.max.ind[2]
 
   ## paste lower 
   if (y.mean.paste.max.ind[1]==1)
-  { 
-    box.new[1,j.max] <- box.paste[1,j.max]
-    x.index <- match(x.paste1.list[[j.max]], x.init[,j.max])
-  }
-  
+  {
+     x.new <- x.paste1.list[[j.max]] 
+     y.new <- y.paste1.list[[j.max]]
+     box.new[1,j.max] <- box.paste[1,j.max]
+  }   
   ## paste upper
   else if (y.mean.paste.max.ind[1]==2)
   {
-    box.new[2,j.max] <- box.paste[2,j.max]
-    x.index <- match(x.paste2.list[[j.max]], x.init[,j.max])
+     x.new <- x.paste2.list[[j.max]] 
+     y.new <- y.paste2.list[[j.max]]
+     box.new[2,j.max] <- box.paste[2,j.max]
   }
-
-  x.new <- x.init[x.index,]
-  y.new <- y.init[x.index]
+  
   mass.new <- length(y.new)/n
   y.mean.new <- mean(y.new)
 
@@ -728,7 +714,7 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
 
 
 plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE,
-                        ...)
+                        size=3, ...)
 { 
   clear3d()
   rgl.bg(color="white")
@@ -772,9 +758,9 @@ plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=T
     ## colour data in i-th box
     xdata <- x$x[[i]]
     if (is.vector(xdata))
-      points3d(xdata[1], xdata[2], xdata[3], color=color[i])
+      points3d(xdata[1], xdata[2], xdata[3], color=color[i], size=size)
     else
-      points3d(xdata[,1], xdata[,2], xdata[,3], color=color[i])
+      points3d(xdata[,1], xdata[,2], xdata[,3], color=color[i], size=size)
   }
   invisible()
 }
@@ -826,7 +812,7 @@ plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, ...)
 ## last row is overall y mean and total mass covered by boxes 
 ###############################################################################
 
-summary.prim <- function(object, ...)
+summary.prim <- function(object, ..., print.box=FALSE)
 {
   x <- object
   M <- x$num.class
@@ -839,156 +825,29 @@ summary.prim <- function(object, ...)
   summ.mat <- rbind(summ.mat, tot)
   
   rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
-  colnames(summ.mat) <- c("box-mean", "box-mass", "box-ind")
+  colnames(summ.mat) <- c("box-mean", "box-mass", "threshold.type")
 
   if (x$num.hdr.class < x$num.class)
     for (k in (x$num.hdr.class+1):x$num.class)
       rownames(summ.mat)[k] <- paste(rownames(summ.mat)[k], "*",sep="")
 
   print(summ.mat)
+  cat("\n")
   
-  if (x$num.hdr.class < x$num.class)
-    cat("\n* - box not in highest density region at level =", x$threshold,"\n\n")
-
-  for (k in 1:M)
-  {
-    cat(paste("Box limits for box", k, "\n", sep=""))
-    box.summ <- x$box[[k]]
-    rownames(box.summ) <- c("min", "max")
-    print(box.summ)
-    cat("\n")
+  ##if (x$num.hdr.class < x$num.class)
+  ##  cat("\n* - box not in highest density region at level =", x$threshold,"\n\n")
+  
+  if (print.box)
+  { 
+    for (k in 1:M)
+    {
+      cat(paste("Box limits for box", k, "\n", sep=""))
+       box.summ <- x$box[[k]]
+       rownames(box.summ) <- c("min", "max")
+       print(box.summ)
+      cat("\n")
+    }
   }
 }
 
-
-############################################################################
-## PRIM threshold tuning parameter
-## Based on k-means clustered normal mixture Monte Carlo approx.
-############################################################################
-
-prim.thresh.symdiff.mixt <- function(prim.plus, prim.minus, mus1, Sigmas1, props1, mus2, Sigmas2, props2, weight.dd=1/2, weight.mixt=1/2, nmc=1e6, alpha=0.5, xmc.dd, taumc.dd, gmc.mixt.dd, xmc.mixt, threshold.plus.range, threshold.minus.range, verbose=FALSE)
-{
-  if (missing(xmc.dd))
-    xmc.dd <- rmvnorm.mixt.dd(n=nmc, mus1, Sigmas1, props1, mus2, Sigmas2, props2)
-
-  if (missing(taumc.dd))
-    taumc.dd <- thresh.mixt.dd.mc(mus1=mus1, Sigmas1=Sigmas1, props1=props1, mus2=mus2, Sigmas2=Sigmas2, props2=props2, weight.dd=weight.dd, xmc=xmc.dd, alpha=alpha, unit.trans=FALSE)
-  
-  if (missing(xmc.mixt))
-    xmc.mixt <- rmvnorm.mixt.mixt(n=nmc, mus1=mus1, Sigmas1=Sigmas1, props1=props1, mus2=mus2, Sigmas2=Sigmas2, props2=props2, weight.mixt=weight.mixt)
-  
-  if (missing(gmc.mixt.dd))
-    (gmc.mixt.dd) <- dmvnorm.mixt.dd(x=xmc.mixt, mus1=mus1, Sigmas1=Sigmas1, props1=props1, mus2=mus2, Sigmas2=Sigmas2, props2=props2, weight.dd=weight.dd)
-
-  xinR.plus <- gmc.mixt.dd >= taumc.dd[1]
-  xinR.minus <- gmc.mixt.dd <= taumc.dd[2]
-
-  ## default threshold ranges
-  if (missing(threshold.plus.range))
-  {
-    ##if (prim.plus$num.hdr.class >1)
-    ##{
-    ##  temp.range <- prim.plus$y.mean[1:prim.plus$num.hdr.class]
-    ##  threshold.plus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
-    ##}
-    ##else
-    ##  threshold.plus.range <- trunc(prim.plus$y.mean[1]*100)/100
-    threshold.plus.range <- sort(prim.plus$y.mean[prim.plus$y.mean>=mean(prim.plus$y.mean)])
-    
-  }
-  
-  if (missing(threshold.minus.range))
-  {
-    ##if (prim.minus$num.hdr.class >1)
-    ##{
-    ##  temp.range <- prim.minus$y.mean[1:prim.minus$num.hdr.class] 
-    ##  threshold.minus.range <- trunc(seq(min(temp.range), max(temp.range), length=11)*100)/100
-    ##}
-    ##else
-    ##  threshold.minus.range <- trunc(prim.minus$y.mean[1]*100)/100
-    threshold.minus.range <- sort(prim.minus$y.mean[prim.minus$y.mean<=mean(prim.minus$y.mean)])
-  }
-
-  
-  ## step through threshold ranges to find min. error
-  err.plus <- 0
-  if (!missing(prim.plus))
-  {  
-    err.plus <- vector()
-    i <- 0
-    for (thp in threshold.plus.range)
-    {
-      prim.plus.hdr <- prim.hdr(prim=prim.plus, threshold=thp, threshold.type=1)
-      
-      xmc.mixt.class <- which.box(x=xmc.mixt, box.seq=prim.plus.hdr)
-      xmc.mixt.class[xmc.mixt.class<=length(prim.plus.hdr$ind)] <- 1
-      xmc.mixt.class[xmc.mixt.class>length(prim.plus.hdr$ind)] <- 0
-      
-      xinRhat <- xmc.mixt.class
-      xinRhat.plus <- xinRhat==1
-      symdiff.plus <- (xinR.plus & !xinRhat.plus) | (!xinR.plus & xinRhat.plus)
-      i <- i+1
-      err.plus[i] <- mean(symdiff.plus)
-      if (verbose) print(c(thp, err.plus[i]))  
-    }
-    
-    thresh.plus <- rev(threshold.plus.range)[which.min(rev(err.plus))]
-  }
-    
- 
-  err.minus <- 0
-  if (!missing(prim.minus))
-  {
-    err.minus <- vector()
-    i <- 0
-    
-    for (thm in threshold.minus.range)
-    {
-      prim.minus.hdr <- prim.hdr(prim=prim.minus, threshold=thm, threshold.type=-1)
-      
-      if (!is.null(prim.minus.hdr))
-      {
-        xmc.mixt.class <- which.box(x=xmc.mixt, box.seq=prim.minus.hdr)
-        xmc.mixt.class[xmc.mixt.class<=length(prim.minus.hdr$ind)] <- -1
-        xmc.mixt.class[xmc.mixt.class>length(prim.minus.hdr$ind)] <- 0
-        
-        xinRhat <- xmc.mixt.class
-        xinRhat.minus <- xinRhat==-1
-        symdiff.minus <- (xinR.minus & !xinRhat.minus) | (!xinR.minus & xinRhat.minus)
-        i <- i+1
-        err.minus[i] <- mean(symdiff.minus)}
-      else
-      {
-        i <- i+1
-        err.minus[i] <- 1
-      }
-      if (verbose) print(c(thm, err.minus[i]))
-    }
-  
-    thresh.minus <- threshold.minus.range[which.min(err.minus)]
-  }
-
-  err <- min(err.plus) + min(err.minus)
-
-  if (verbose)
-  {
-    tab.plus <- rbind(threshold.plus.range, err.plus)
-    rownames(tab.plus) <- c("thresh.plus", "err.plus")
-    tab.minus <- rbind(threshold.minus.range, err.minus)
-    rownames(tab.minus) <- c("thresh.minus", "err.minus")
-    print(tab.plus)
-    print(tab.minus)
-  }
-    
-  if (missing(prim.minus) & !missing(prim.plus))
-    thresh.val <- thresh.plus
-  if (missing(prim.plus) & !missing(prim.minus))
-    thresh.val <- thresh.minus
-  if (!missing(prim.plus) & !missing(prim.minus))
-    thresh.val <- c(thresh.plus, thresh.minus) 
-  if (missing(prim.plus) & missing(prim.minus))
-    thresh.val <- NULL
-
-  return(thresh.val)
-}
 

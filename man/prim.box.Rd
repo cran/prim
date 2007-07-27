@@ -126,15 +126,15 @@ Sigmas.p <- 0.125*rbind(diag(2), diag(c(0.5, 0.5)),
    diag(c(0.125, 0.25)), diag(c(0.125, 0.25))) 
 props.p <- c(0.5, 0.25, 0.125, 0.125)
 
-mus.m <- rbind(c(0,0), c(2,0), c(2.5, 2))
-Sigmas.m <- 0.125*rbind(invvech(c(1,-0.6,1)),
+mus.n <- rbind(c(0,0), c(2,0), c(2.5, 2))
+Sigmas.n <- 0.125*rbind(matrix(c(1,-0.6,-0.6,1), nrow=2),
    diag(c(0.5, 0.5)),diag(c(0.125, 0.25))) 
-props.m <- c(0.625, 0.25, 0.125)
+props.n <- c(0.625, 0.25, 0.125)
 
 x.p <- rmvnorm.mixt(n, mus.p, Sigmas.p, props.p)
-x.m <- rmvnorm.mixt(n, mus.m, Sigmas.m, props.m)
-x <- rbind(x.p, x.m)
-y <- c(rep(1, nrow(x.p)), rep(-1, nrow(x.m)))
+x.n <- rmvnorm.mixt(n, mus.n, Sigmas.n, props.n)
+x <- rbind(x.p, x.n)
+y <- c(rep(1, nrow(x.p)), rep(-1, nrow(x.n)))
   ## 1 = positive sample, -1 = negative sample
 
 y.thr <- c(1, -0.35)
@@ -146,23 +146,18 @@ x.prim1 <- prim.box(x=x, y=y, threshold=y.thr, threshold.type=0)
 ## alternative - requires more commands but allows more control
 ## in intermediate stages
 
-x.prim.hdr.plus <- prim.box(x=x, y=y, threshold.type=1,
+x.prim.hdr.p <- prim.box(x=x, y=y, threshold.type=1,
    threshold=1)
 
-x.prim.minus <- prim.box(x=x, y=y, threshold.type=-1)
-summary(x.prim.minus)
+x.prim.n <- prim.box(x=x, y=y, threshold.type=-1)
+summary(x.prim.n)
    ## threshold too high, try lower one
 
-x.prim.hdr.minus <- prim.hdr(x.prim.minus, threshold=-0.35,
+x.prim.hdr.n <- prim.hdr(x.prim.n, threshold=-0.35,
    threshold.type=-1)
-x.prim2 <- prim.combine(x.prim.hdr.plus, x.prim.hdr.minus)
+x.prim2 <- prim.combine(x.prim.hdr.p, x.prim.hdr.n)
        
 plot(x.prim2)
-
-col <- x.prim2$ind
-col[col==1] <- "orange"
-col[col==-1] <- "blue" 
-plot(x.prim2, col=col)
 
 summary(x.prim1)
 summary(x.prim2) ## should be exactly the same as command above

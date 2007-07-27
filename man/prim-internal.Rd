@@ -2,7 +2,7 @@
 
 \alias{in.box}
 \alias{counts.box}
-\alias{prim.thresh.symdiff.mixt} 
+\alias{prim.thresh.mixt.dd} 
 \alias{which.box}
 
 \title{Internal functions in the prim library}
