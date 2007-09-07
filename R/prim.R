@@ -97,15 +97,17 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   {
     box.init <- apply(x, 2, range)
     box.diff <- box.init[2,] - box.init[1,]
-    box.init[1,] <- box.init[1,] - 0.1*box.diff
-    box.init[2,] <- box.init[2,] + 0.1*box.diff
+    box.init[1,] <- box.init[1,] - 10*paste.alpha*box.diff
+    box.init[2,] <- box.init[2,] + 10*paste.alpha*box.diff
   }
   
   ## find first box
   k <- 1
+  
   boxk <- find.box(x=x, y=y, box=box.init, peel.alpha=peel.alpha,
                    paste.alpha=paste.alpha, mass.min=mass.min,
-                   threshold=mean(y), d=d, n=n, pasting=pasting, verbose=verbose)
+                   threshold=min(y)-0.1*abs(min(y)), d=d, n=n, pasting=pasting, verbose=verbose)
+		   ##threshold=mean(y)
 
   if (is.null(boxk))
   {
@@ -120,12 +122,11 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   else
   {
     if (verbose)
-      cat(paste("Found find box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4), ", mass=", signif(boxk$mass,4), "\n\n", sep=""))
+      cat(paste("Found box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4), ", mass=", signif(boxk$mass,4), "\n\n", sep=""))
     boxes <- list(x=list(boxk$x), y=list(boxk$y), y.mean=list(boxk$y.mean),
                   box=list(boxk$box), mass=list(boxk$mass))       
   }
-
-  
+    
   ## find subsequent boxes
   if (num.boxes > 1)
   {
@@ -142,15 +143,15 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     x.out <- x[x.out.ind,]
     if (is.vector(x.out)) x.out <- as.matrix(t(x.out)) 
     y.out <- y[x.out.ind]
-    
+      
     ##box.out <- apply(x.out, 2, range)
-    while ((k < num.boxes) & (!is.null(boxk))) 
+    while ((length(y.out)>0) & (k < num.boxes) & (!is.null(boxk))) 
     {
       k <- k+1
-
+      
       boxk <- find.box(x=x.out, y=y.out, box=box.init,
                        peel.alpha=peel.alpha, paste.alpha=paste.alpha,
-                       mass.min=mass.min, threshold=min(y), d=d, n=n,
+                       mass.min=mass.min, threshold=min(y)-0.1*abs(min(y)), d=d, n=n,
                        pasting=pasting, verbose=verbose)
 
       if (is.null(boxk))
@@ -168,7 +169,7 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
       {
         ## update x and y
         if (verbose)
-          cat(paste("Found find box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4),
+          cat(paste("Found box ", k, ": y.mean=", signif(threshold.type*boxk$y.mean,4),
                     ", mass=", signif(boxk$mass,4), "\n\n", sep=""))
         
         x.out.ind.mat <- matrix(TRUE, nrow=nrow(x), ncol=ncol(x))
@@ -189,7 +190,6 @@ prim.one <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
     }   
   }
 
- 
   ## adjust for negative hdr  
   for (k in 1:length(boxes$y.mean))
   {
@@ -359,7 +359,7 @@ prim.combine <- function(prim1, prim2)
 ## mass.min - min box mass
 ## threshold - min box mean
 ## pasting - TRUE - include pasting step (after peeling)
-##         - FALSE - don't include pasting
+##         - FALSE - dont include pasting
 ##
 ## Returns
 ## List with fields
@@ -394,14 +394,13 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold,
   
   if (verbose)
     cat("Peeling completed \n")
- 
+  
   if (pasting)
   {
     boxk.paste <- boxk.temp
     
     while (!is.null(boxk.paste))
     {
-      
       boxk.temp <- boxk.paste
       boxk.paste <- paste.one(x=boxk.temp$x, y=boxk.temp$y, box=boxk.temp$box,
                               x.init=x, y.init=y, paste.alpha=paste.alpha,
@@ -459,22 +458,15 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=5)
     y.mean.peel[1,j] <- mean(y[x[,j] >= box.min.new])
     y.mean.peel[2,j] <- mean(y[x[,j] <= box.max.new])
 
-   
     box.temp1 <- box
     box.temp2 <- box
     box.temp1[1,j] <- box.min.new
     box.temp2[2,j] <- box.max.new
-    #if (box.temp2[2,3] < 0.904 & box.temp2[2,3] > 0.903)
-    #  {print(box.temp1)
-    #   print(box.temp2)
-    #   print(y.mean.peel)
-    #   browser()
-    # }
     box.vol.peel[1,j] <- vol.box(box.temp1)
     box.vol.peel[2,j] <- vol.box(box.temp2)    
   }
   
-  y.mean.peel.max.ind <- which(y.mean.peel==max(y.mean.peel), arr.ind=TRUE)
+  y.mean.peel.max.ind <- which(y.mean.peel==max(y.mean.peel, na.rm=TRUE), arr.ind=TRUE)
 
   ## break ties by choosing box with largest volume
 
@@ -567,12 +559,14 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
   y.paste1.list <- list()
   y.paste2.list <- list()
 
+  box.paste1 <- box
+  box.paste2 <- box
+   
   for (j in 1:d)
   {    
     ## candidates for pasting
     box.diff <- (box.init[2,] - box.init[1,])[j]
-    box.paste1 <- box
-    box.paste2 <- box
+
     box.paste1[1,j] <- box[1,j] - box.diff*paste.alpha
     box.paste2[2,j] <- box[2,j] + box.diff*paste.alpha
     
@@ -583,7 +577,24 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
     x.paste2.ind <- in.box(x=x.init, box=box.paste2, d=d, boolean=TRUE)
     x.paste2 <- x.init[x.paste2.ind,]
     y.paste2 <- y.init[x.paste2.ind]
+      
+    while (length(y.paste1) <= length(y) & box.paste1[1,j] >= box.init[1,j])
+    {
+      box.paste1[1,j] <- box.paste1[1,j] - box.diff*paste.alpha
+      x.paste1.ind <- in.box(x=x.init, box=box.paste1, d=d, boolean=TRUE)
+      x.paste1 <- x.init[x.paste1.ind,]
+      y.paste1 <- y.init[x.paste1.ind]
+    }
     
+    while (length(y.paste2) <= length(y) & box.paste2[2,j] <= box.init[2,j])
+    {
+      box.paste2[2,j] <- box.paste2[2,j] + box.diff*paste.alpha
+      x.paste2.ind <- in.box(x=x.init, box=box.paste2, d=d, boolean=TRUE)
+      x.paste2 <- x.init[x.paste2.ind,]
+      y.paste2 <- y.init[x.paste2.ind]
+    }
+
+   
     ## y means of pasted boxes
     y.mean.paste[1,j] <- mean(y.paste1)
     y.mean.paste[2,j] <- mean(y.paste2)
@@ -602,7 +613,7 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha,
 
   ## break ties by choosing box with largest mass
   
-  y.mean.paste.max <- which(y.mean.paste==max(y.mean.paste), arr.ind=TRUE)
+  y.mean.paste.max <- which(y.mean.paste==max(y.mean.paste, na.rm=TRUE), arr.ind=TRUE)
   
   if (nrow(y.mean.paste.max)>1)
   {
@@ -656,7 +667,7 @@ plot.prim <- function(x, splom=TRUE, ...)
   if (ncol(x$x[[1]])==2)
     plotprim.2d(x, ...)
   else if (ncol(x$x[[1]])==3 & !splom)
-    plotprim.3d(x, ...)
+    warning("RGL 3-d plotting temporarily disabled") ##plotprim.3d(x, ...)
   else if (ncol(x$x[[1]])>3 | (ncol(x$x[[1]])==3 & splom))
     plotprim.nd(x, ...)
   
@@ -849,5 +860,6 @@ summary.prim <- function(object, ..., print.box=FALSE)
     }
   }
 }
+
 
 
