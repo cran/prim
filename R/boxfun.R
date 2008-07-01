@@ -42,8 +42,7 @@ in.box <- function(x, box, d, boolean=FALSE)
 ## box - box limits
 ## box.mass - box mass 
 ##
-## NB: if y is missing from the call to in.box.list, then $y and $y.mean
-## aren't computed
+## NB: if y is missing from the call, then $y and $y.mean aren't computed
 ###############################################################################
 
 
@@ -98,7 +97,7 @@ in.box.seq <- function(x, y, box.seq)
 ## Vector of box numbers
 ###############################################################################
 
-which.box <- function(x, box.seq)
+prim.which.box <- function(x, box.seq)
 {
   ind <- rep(0,nrow(x))
   m <- box.seq$num.class
@@ -141,7 +140,7 @@ counts.box <- function(x, box.seq)
 {
   m <- box.seq$num.class
   x.counts <- rep(0, m)
-  x.class <- which.box(x, box.seq)
+  x.class <- prim.which.box(x, box.seq)
  
   for (k in 1:m)
     x.counts[k] <- sum(x.class==k)

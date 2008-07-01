@@ -27,7 +27,7 @@ November\or December\fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title{Using prim for bump hunting}
-\author{Tarn Duong \\ Department of Statistics, University of New South Wales \\ Sydney Australia}
+\author{Tarn Duong}
 
 
 

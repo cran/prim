@@ -4,25 +4,11 @@ export(in.box)
 export(prim.box)
 export(prim.combine)
 export(prim.hdr)
-export(prim.thresh.mixt.dd)
-export(which.box)
-       
+#export(prim.thresh.mixt.dd)
+export(prim.which.box)
+
+
 S3method(plot, prim)
 S3method(summary, prim)
 
-              
-## not exported
-
-## 
-## export(find.box)
-## export(in.box.j)
-## export(in.box.seq)
-## export(overlap.box)
-## export(overlap.box.seq)
-## export(paste.one)
-## export(peel.one)
-## export(prim.one)
-## export(plotprim.2d)
-## export(plotprim.3d)
-## export(plotprim.nd)
-## export(vol.box)
+             

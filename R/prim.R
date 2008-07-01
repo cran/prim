@@ -65,7 +65,7 @@ prim.box <- function(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
   
   ## re-do prim to ensure that no data points are missed from the `dump' box 
   prim.reg <- prim.temp
-  prim.labels <- which.box(x=x, box.seq=prim.reg)
+  prim.labels <- prim.which.box(x=x, box.seq=prim.reg)
   for (k in 1:prim.reg$num.class)
   {
     primk.ind <- which(prim.labels==k)
@@ -332,7 +332,7 @@ prim.combine <- function(prim1, prim2)
       prim.temp$ind[[i+M1]] <- -1
     }
     
-    dumpx.ind <- which.box(x, prim1)==prim1$num.class & which.box(x, prim2)==prim2$num.class
+    dumpx.ind <- prim.which.box(x, prim1)==prim1$num.class & prim.which.box(x, prim2)==prim2$num.class
     
     prim.temp$x[[M1+M2+1]] <- x[dumpx.ind,]
     prim.temp$y[[M1+M2+1]] <- y[dumpx.ind]
@@ -667,7 +667,9 @@ plot.prim <- function(x, splom=TRUE, ...)
   if (ncol(x$x[[1]])==2)
     plotprim.2d(x, ...)
   else if (ncol(x$x[[1]])==3 & !splom)
-    warning("RGL 3-d plotting temporarily disabled") ##plotprim.3d(x, ...)
+  {  warning("RGL 3-d plotting temporarily disabled") 
+     plotprim.3d(x, ...)
+   }
   else if (ncol(x$x[[1]])>3 | (ncol(x$x[[1]])==3 & splom))
     plotprim.nd(x, ...)
   
@@ -724,9 +726,10 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
 }
 
 
-plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE,
-                        size=3, ...)
-{ 
+plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE, size=3, ...)
+{
+  require(rgl)
+  require(misc3d)
   clear3d()
   rgl.bg(color="white")
   
