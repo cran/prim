@@ -137,7 +137,7 @@ x <- rbind(x.p, x.n)
 y <- c(rep(1, nrow(x.p)), rep(-1, nrow(x.n)))
   ## 1 = positive sample, -1 = negative sample
 
-y.thr <- c(1, -0.35)
+y.thr <- c(0.8, -0.35)
 
 ## using only one command
 
@@ -147,7 +147,7 @@ x.prim1 <- prim.box(x=x, y=y, threshold=y.thr, threshold.type=0)
 ## in intermediate stages
 
 x.prim.hdr.p <- prim.box(x=x, y=y, threshold.type=1,
-   threshold=1)
+   threshold=0.8)
 
 x.prim.n <- prim.box(x=x, y=y, threshold.type=-1)
 summary(x.prim.n)

@@ -37,9 +37,9 @@ November\or December\fi
 
 \maketitle
 
-\section{Introduction}
+%\section{Introduction}
 
-The Patient Rule Induction Method (PRIM) was introduced
+\noindent The Patient Rule Induction Method (PRIM) was introduced
 by \citet*{friedman99}. It is a technique from data mining 
 for finding `interesting' regions in high-dimensional data. 
 We start with regression-type data $(\vecX_1, Y_1), \dots, (\vecX_n, Y_n)$
@@ -78,8 +78,8 @@ xflown <- quasiflow[yflow==-1,1:3]
 We can think of \texttt{xflowp} as flow cytometric measurements from an
 HIV+ patient, and \texttt{xflown} from an HIV-- patient.
 <<fig=FALSE,print=FALSE,results=hide>>=
-pairs(xflowp[1:100,])
-pairs(xflown[1:100,])
+pairs(xflowp[1:300,])
+pairs(xflown[1:300,])
 @ 
 
 \setkeys{Gin}{width=0.45\textwidth}
@@ -87,11 +87,11 @@ pairs(xflown[1:100,])
 \begin{tabular}{cc}
 HIV+ & HIV-- \\
 <<fig=TRUE,echo=FALSE,print=FALSE,results=hide>>=
-pairs(xflowp[1:100,])
+pairs(xflowp[1:300,])
 @ 
 &
 <<fig=TRUE,echo=FALSE,print=FALSE,results=hide>>=
-pairs(xflown[1:100,])
+pairs(xflown[1:300,])
 @
 \end{tabular}
 \end{center}
@@ -135,25 +135,17 @@ negative HDR is coloured blue.
 %%can overlap considerably e.g. $(x_1, x_2)$.
 %%We conclude that there are more HIV+ patients
 %%within the orange regions and more HIV-- patients within the blue regions. 
-The following plot is not exactly the output produced by the commands,
-but has been thinned for clarity.
-<<fig=FALSE,print=FALSE>>=
-cols <- qflow.prim2$ind
-cols[cols==1] <- "orange"
-cols[cols==-1] <- "blue"
-plot(qflow.prim2, col=cols)
-@
- 
-\setkeys{Gin}{width=0.65\textwidth}
+%%The following plot is not exactly the output produced by the commands,
+%%but has been thinned for clarity.
+<<fig=FALSE>>=
+col <- c("blue", "orange")[(qflow.prim2$ind+3)/2]
+plot(qflow.prim2,  x.pt=rbind(xflowp[1:300,], xflown[1:300,]), col=col)
+@ 
+\setkeys{Gin}{width=0.45\textwidth}
 \begin{center}
-<<fig=TRUE,print=FALSE,echo=FALSE>>=
-qflow.prim3 <- qflow.prim2
-for (i in 1:qflow.prim2$num.class)
-  qflow.prim3$x[[i]] <- qflow.prim3$x[[i]][1:50,] 
-cols <- qflow.prim3$ind
-cols[cols==1] <- "orange"
-cols[cols==-1] <- "blue"
-plot(qflow.prim3, col=cols)
+<<fig=TRUE,echo=FALSE,print=FALSE,results=hide>>=
+col <- c("blue", "orange")[(qflow.prim2$ind+3)/2]
+plot(qflow.prim2, x.pt=rbind(xflowp[1:300,], xflown[1:300,]), col=col)
 @ 
 \end{center}
 

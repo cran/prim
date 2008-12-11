@@ -178,7 +178,7 @@ vol.box <- function(box)
 ## TRUE if they overlap, FALSE o/w
 ####################################################################
 
-overlap.box.seq <-function(box.seq1, box.seq2)
+overlap.box.seq <-function(box.seq1, box.seq2, rel.tol=0.01)
 {
   M1 <- box.seq1$num.hdr.class
   M2 <- box.seq2$num.hdr.class
@@ -188,17 +188,10 @@ overlap.box.seq <-function(box.seq1, box.seq2)
   for (i in 1:M1)
   {
     box1 <- box.seq1$box[[i]]
-    
     for (j in 1:M2)
     {  
       box2 <- box.seq2$box[[j]]
-      overlap <- TRUE
-      for (k in 1:d)
-        overlap <- overlap & (((box1[1,k] <= box2[1,k]) & (box2[1,k] <= box1[2,k]))
-                              | ((box1[1,k] <= box2[2,k]) & (box2[2,k] <= box1[2,k]))
-                              | ((box2[1,k] <= box1[1,k]) & (box1[1,k] <= box2[2,k]))
-                              | ((box2[1,k] <= box1[2,k]) & (box1[2,k] <= box2[2,k])))
-      overlap.mat[i,j] <- overlap
+      overlap.mat[i,j] <- overlap.box(box1, box2, rel.tol=rel.tol)
     }
   }
 
@@ -217,16 +210,27 @@ overlap.box.seq <-function(box.seq1, box.seq2)
 ####################################################################
 
 
-overlap.box <-function(box1, box2)
+overlap.box <-function(box1, box2, rel.tol=0.01)
 {
   d <- ncol(box1)
 
   overlap <- TRUE
+
+  box1.tol <- box1
+  box1.range <- abs(apply(box1, 2, diff))
+  box1.tol[1,] <- box1.tol[1,] + rel.tol*box1.range
+  box1.tol[2,] <- box1.tol[2,] - rel.tol*box1.range
+  
+  box2.tol <- box2
+  box2.range <- abs(apply(box2, 2, diff))
+  box2.tol[1,] <- box2.tol[1,] + rel.tol*box2.range
+  box2.tol[2,] <- box2.tol[2,] - rel.tol*box2.range
+  
   for (k in 1:d)
-    overlap <- overlap & (((box1[1,k] <= box2[1,k]) & (box2[1,k] <= box1[2,k]))
-                          | ((box1[1,k] <= box2[2,k]) & (box2[2,k] <= box1[2,k]))
-                          | ((box2[1,k] <= box1[1,k]) & (box1[1,k] <= box2[2,k]))
-                          | ((box2[1,k] <= box1[2,k]) & (box1[2,k] <= box2[2,k])))
+    overlap <- overlap & (((box1.tol[1,k] <= box2.tol[1,k]) & (box2.tol[1,k] <= box1.tol[2,k]))
+                          | ((box1.tol[1,k] <= box2.tol[2,k]) & (box2.tol[2,k] <= box1.tol[2,k]))
+                          | ((box2.tol[1,k] <= box1.tol[1,k]) & (box1.tol[1,k] <= box2.tol[2,k]))
+                          | ((box2.tol[1,k] <= box1.tol[2,k]) & (box1.tol[2,k] <= box2.tol[2,k])))
   
   return(overlap)
 }

@@ -26,7 +26,7 @@
   %\item{splom}{flag for plotting 3-d data as scatter plot matrix or 3-d
   %  RGL plot. Default is TRUE (scatter plot matrix).}
   \item{add.legend}{flag for adding legend (2-d plot)}
-  \item{pos.legend}{(x,y) co-ordinates for leaned (2-d plot)}
+  \item{pos.legend}{(x,y) co-ordinates for legend (2-d plot)}
   \item{cex.legend}{cex graphics parameter for legend (2-d plot)}
   \item{col}{vector of plotting colours, one for each box}
   \item{xlab,ylab,zlab,xlim,ylim,zlim,add,lwd}{usual graphics parameters}

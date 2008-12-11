@@ -294,8 +294,8 @@ prim.combine <- function(prim1, prim2)
     return(prim1)
   if (is.null(M1) & is.null(M2))
     return(NULL)
-    
-  overlap <- overlap.box.seq(prim1, prim2)
+
+  overlap <- overlap.box.seq(prim1, prim2, rel.tol=0.01)
 
   x <- numeric()
   y <- vector()
@@ -439,7 +439,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold,
 ## mass - box mass
 ###############################################################################
 
-peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=5)
+peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=8)
 {
   box.new <- box
   mass <- length(y)/n
@@ -781,34 +781,30 @@ plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=T
 
 
 
-plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, ...)
+plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab,  x.pt, m, ...)
 {
   M <- x$num.hdr.class
-  M2 <- x$num.class
-
-  x.names <- colnames(x$x[[1]])
-  if (is.null(x.names)) x.names <- c("x","y")
-  
-  if (missing(xlab)) xlab <- x.names[1]
-  if (missing(ylab)) ylab <- x.names[2]
-  
+  d <- ncol(x$x)
   if (missing(col))
-    col <- topo.colors(M)
-  if (length(col) < M)
-    col <- rep(col, length=M)
-  
-  if (missing(xmin)) xmin <- x$box[[M2]][1,]
-  if (missing(xmax)) xmax <- x$box[[M2]][2,]
+    col <- c(topo.colors(M), "transparent")
 
-  xdata <- numeric()
-  xcol <- numeric() 
-  for (i in M:1)
+  if (missing(m) & !missing(x.pt)) m <- round(nrow(x.pt)/10)
+  if (missing(x.pt))
   {
-    xdata <- rbind(xdata, x$x[[i]])
-    xcol <- c(xcol, rep(col[i], nrow(as.matrix(x$x[[i]])))) 
+    x.pt <- numeric()
+    for (j in 1:length(x$x))
+      x.pt <- rbind(x.pt,x$x[[j]])
+    if (missing(m)) m <- round(nrow(x.pt)/10)
+    x.pt <- x.pt[sample(1:nrow(x.pt), size=m),]
   }
+
+  xprim <- prim.which.box(x.pt, box.seq=x)
+  xprim.ord <- order(xprim)
+  x.pt <- x.pt[xprim.ord,]
+  xprim.col <- col[xprim][xprim.ord]
  
-  pairs(rbind(xmin, xmax, xdata), col=c("transparent", "transparent",xcol), ...)
+  pairs(x.pt, col=xprim.col,  ...)
+
   invisible()
 }
 
