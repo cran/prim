@@ -1,7 +1,7 @@
 \documentclass[a4paper,11pt]{article}
 
-\usepackage{natbib,anysize,amsmath,amsopn,amssymb}
-\marginsize{3cm}{3cm}{3cm}{3cm}
+\usepackage{natbib,amsmath,amsopn,amssymb,titling}
+\usepackage[left=2.5cm,top=2.5cm,right=2.5cm,bottom=2.5cm]{geometry}
 
 \renewcommand{\today}{\begingroup
 \number \day\space  \ifcase \month \or January\or February\or March\or 
@@ -34,7 +34,7 @@ November\or December\fi
 %\SweaveOpts{eps=FALSE,pdf=FALSE}
 \begin{document}
 
-
+\setlength{\droptitle}{-2em}
 \maketitle
 
 %\section{Introduction}
@@ -119,32 +119,37 @@ points(x[y>3.5,])
 There are many options for the graphical display. See
 the help guide for more details \texttt{?plot.prim}.
 
-
-
+We attempt PRIM with categorical variables. We replace 
+the average number of room per dwelling (\texttt{rm})
+with the index of accessibility to radial highways (\texttt{rad})
+which takes integral values from 1 to 24 inclusive.
+<<print=FALSE,fig=FALSE>>= 
+x2 <- Boston[,c(5,9)]  
+y <- Boston[,1]  
+boston.cat.prim <- prim.box(x=x2, y=y, threshold.type=1)
+summary(boston.cat.prim, print.box=TRUE)
+plot(boston.cat.prim, col="transparent")
+points(x2[y>3.5,])
+@
+\setkeys{Gin}{width=0.45\textwidth}
+\begin{center}
+<<fig=TRUE,echo=FALSE>>=
+plot(boston.cat.prim, col="transparent")
+points(x2[y>3.5,])
+@
+\end{center}
 
 \bibliographystyle{apalike}
 
 
 \begin{thebibliography}{}
 
-%\bibitem[{Duong, Koch and Wand}, 2007]{duong07b}
-%Duong, T., Koch, I., and Wand, M.~P. (2007).
-%\newblock A generalised chi-squared test for comparing samples from data rich
-%  sources: an example from flow cytometry.
-%\newblock In preparation.
 
 \bibitem[Friedman and Fisher, 1999]{friedman99}
 Friedman, J.~H. and Fisher, N.~I. (1999).
 \newblock Bump-hunting for high dimensional data.
 \newblock {\em Statistics and Computing}, \textbf{9}, 123--143.
 
-%\bibitem[Hyndman, 1996]{hyndman96}
-%Hyndman, R.~J. (1996).
-%\newblock Computing and graphing highest density regions.
-%\newblock {\em The American Statistician}, \textbf{50}, 120--126.
-
 \end{thebibliography}
-
-%\bibliography{/c/tduong/home/research/references}
 
 \end{document}

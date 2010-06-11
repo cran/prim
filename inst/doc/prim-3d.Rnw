@@ -1,7 +1,7 @@
 \documentclass[a4paper,11pt]{article}
 
-\usepackage{natbib,anysize,amsmath,amsopn,amssymb}
-\marginsize{3cm}{3cm}{3cm}{3cm}
+\usepackage{natbib,amsmath,amsopn,amssymb,titling}
+\usepackage[left=2.5cm,top=2.5cm,right=2.5cm,bottom=2.5cm]{geometry}
 
 \renewcommand{\today}{\begingroup
 \number \day\space  \ifcase \month \or January\or February\or March\or 
@@ -34,7 +34,7 @@ November\or December\fi
 %\SweaveOpts{eps=FALSE,pdf=FALSE}
 \begin{document}
 
-
+\setlength{\droptitle}{-2em}
 \maketitle
 
 %\section{Introduction}
