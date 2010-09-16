@@ -99,11 +99,12 @@ in.box.seq <- function(x, y, box.seq)
 
 prim.which.box <- function(x, box.seq)
 {
+  if (is.vector(x)) x <- t(as.matrix(x))
   ind <- rep(0,nrow(x))
   m <- box.seq$num.class
   d <- ncol(x)
   n <- nrow(x)
-  
+
   x.ind <- rep(TRUE, n)
   x.which.box <- rep(0,n)
 

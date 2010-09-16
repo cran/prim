@@ -7,7 +7,6 @@
 \title{PRIM for multivariate data}
 \description{
   PRIM for multivariate data.
-  %Result is an estimate of the highest density region (HDR).
 }
 \usage{
 prim.box(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
@@ -110,56 +109,30 @@ prim.combine(prim1, prim2)
   prim object. Usually used in conjunction with \code{prim.hdr}. See examples below.
 }
 
-\references{
-  Friedman, J.H. \& Fisher, N.I. (1999) Bump-hunting for high
-  dimensional data, \emph{Statistics and Computing}, \bold{9}, 123--143. 
-} 
-
-%\seealso{}
 
 \examples{
-n <- 1000
-set.seed(88192)
-
-mus.p <- rbind(c(0,0), c(2,0), c(1, 2), c(2.5, 2))
-Sigmas.p <- 0.125*rbind(diag(2), diag(c(0.5, 0.5)),
-   diag(c(0.125, 0.25)), diag(c(0.125, 0.25))) 
-props.p <- c(0.5, 0.25, 0.125, 0.125)
-
-mus.n <- rbind(c(0,0), c(2,0), c(2.5, 2))
-Sigmas.n <- 0.125*rbind(matrix(c(1,-0.6,-0.6,1), nrow=2),
-   diag(c(0.5, 0.5)),diag(c(0.125, 0.25))) 
-props.n <- c(0.625, 0.25, 0.125)
-
-x.p <- rmvnorm.mixt(n, mus.p, Sigmas.p, props.p)
-x.n <- rmvnorm.mixt(n, mus.n, Sigmas.n, props.n)
-x <- rbind(x.p, x.n)
-y <- c(rep(1, nrow(x.p)), rep(-1, nrow(x.n)))
-  ## 1 = positive sample, -1 = negative sample
-
-y.thr <- c(0.8, -0.35)
+data(quasiflow)
+qf <- quasiflow[1:1000,1:2]
+qf.label <- quasiflow[1:1000,4]
 
 ## using only one command
-
-x.prim1 <- prim.box(x=x, y=y, threshold=y.thr, threshold.type=0)
+thr <- c(0.25, -0.3)
+qf.prim1 <- prim.box(x=qf, y=qf.label, threshold=thr, threshold.type=0)
 
 ## alternative - requires more commands but allows more control
 ## in intermediate stages
+qf.primp <- prim.box(x=qf, y=qf.label, threshold.type=1)
+   ## default threshold too low, try higher one
 
-x.prim.hdr.p <- prim.box(x=x, y=y, threshold.type=1,
-   threshold=0.8)
+qf.primp.hdr <- prim.hdr(prim=qf.primp, threshold=0.25, threshold.type=1)
+qf.primn <- prim.box(x=qf, y=qf.label, threshold=-0.3, threshold.type=-1)
+qf.prim2 <- prim.combine(qf.primp.hdr, qf.primn)
 
-x.prim.n <- prim.box(x=x, y=y, threshold.type=-1)
-summary(x.prim.n)
-   ## threshold too high, try lower one
+summary(qf.prim1)
+summary(qf.prim2) 
 
-x.prim.hdr.n <- prim.hdr(x.prim.n, threshold=-0.35,
-   threshold.type=-1)
-x.prim2 <- prim.combine(x.prim.hdr.p, x.prim.hdr.n)
-       
-plot(x.prim2)
-
-summary(x.prim1)
-summary(x.prim2) ## should be exactly the same as command above
+plot(qf.prim1)   ## orange=x1>x2, blue x2<x1
+points(qf[qf.label==1,], cex=0.5)
+points(qf[qf.label==-1,], cex=0.5, col=2)
 }
 \keyword{multivariate}

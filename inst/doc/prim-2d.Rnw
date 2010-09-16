@@ -56,7 +56,7 @@ data set in the \texttt{MASS} library. It contains
 housing data measurements for 506 towns in the Boston, USA area.
 For the explanatory variables, we
 take the nitrogen oxides concentration in parts per 10 million (\texttt{nox}) 
-and the average number of room per dwelling (\texttt{rm}). The 
+and the average number of rooms per dwelling (\texttt{rm}). The 
 response is the per capita crime rate (\texttt{crim}). 
 We are interested in characterising those areas with higher crime rates
 in order to provide better support infrastructure.
@@ -120,7 +120,7 @@ There are many options for the graphical display. See
 the help guide for more details \texttt{?plot.prim}.
 
 We attempt PRIM with categorical variables. We replace 
-the average number of room per dwelling (\texttt{rm})
+the average number of rooms per dwelling (\texttt{rm})
 with the index of accessibility to radial highways (\texttt{rad})
 which takes integral values from 1 to 24 inclusive.
 <<print=FALSE,fig=FALSE>>= 

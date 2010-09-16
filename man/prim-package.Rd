@@ -23,22 +23,20 @@ Patient Rule Induction Method (PRIM)
   PRIM is a bump-hunting technique introduced by Friedman \& Fisher
   (1999), taken from data mining.
   PRIM estimates are a sequence of nested hyper-rectangles (boxes).
-  %The
-  %boxes which exceed a threshold comprise the HDR estimate. 
-
+ 
   For an overview of this package, see \code{vignette("prim")} for PRIM
   estimation for 2- and 5-dimensional data. 
 }
 
 \author{
-Tarn Duong <tduong@maths.unsw.edu.au>
+Tarn Duong <tarn.duong@gmail.com>
 }
 
 \references{
   %Duong, T., Koch, I., \& Wand, M.P. (2007) A generalised chi-squared
   %test for comparing sample from data rich sources: an example from flow
   %cytometry. \emph{In preparation.}
-  Friedman, J.H. \& Fisher, N.I. (1999) Bump-hunting for high
+  Friedman, J.H. & Fisher, N.I. (1999) Bump-hunting for high
   dimensional data, \emph{Statistics and Computing}, \bold{9}, 123--143.
 
   Hyndman, R.J.  Computing and graphing highest density

@@ -6,34 +6,13 @@
   PRIM plot for multivariate data.
 }
 
-\synopsis{\method{plot}{prim}(x, splom=TRUE, ...)}
-
 \usage{
-## bivariate
-\method{plot}{prim}(x, col, xlim, ylim, xlab, ylab, add=FALSE,
-   add.legend=FALSE, cex.legend=1, pos.legend, lwd=1, ...)
-
-## trivariate
-\method{plot}{prim}(x, color, xlim, ylim, zlim, xlab, ylab, zlab,
-   add.axis=TRUE, ...)
-
-## d-variate
-\method{plot}{prim}(x, col, xmin, xmax, xlab, ylab, ...)
+\method{plot}{prim}(x, splom=TRUE,  ...)
 }
 
 \arguments{
   \item{x}{an object of class \code{prim}}
-  %\item{splom}{flag for plotting 3-d data as scatter plot matrix or 3-d
-  %  RGL plot. Default is TRUE (scatter plot matrix).}
-  \item{add.legend}{flag for adding legend (2-d plot)}
-  \item{pos.legend}{(x,y) co-ordinates for legend (2-d plot)}
-  \item{cex.legend}{cex graphics parameter for legend (2-d plot)}
-  \item{col}{vector of plotting colours, one for each box}
-  \item{xlab,ylab,zlab,xlim,ylim,zlim,add,lwd}{usual graphics parameters}
-  \item{xmin,xmax}{vector of minimum and maximum axis plotting values for scatter
-    plot matrix}
-  \item{color}{vector of colours, one for each box (3-d plot)}
-  \item{add.axis}{flag for plotting axes (3-d plot)}
+  \item{splom}{flag for plotting 3-d data as scatter plot matrix. Default is TRUE.}
   \item{...}{other graphics parameters}
 }
   
@@ -44,12 +23,32 @@
   matrix. The scatter plots indicate which points belong to which box.
 }
 
-\references{
-  Friedman, J.H. \& Fisher, N.I. (1999) Bump-hunting for high
-  dimensional data, \emph{Statistics and Computing}, \bold{9}, 123--143. 
-}
-
 \details{
+The function headers are
+\preformatted{
+  ## bivariate
+  plot(x, col, xlim, ylim, xlab, ylab, add=FALSE, add.legend=FALSE, 
+    cex.legend=1, pos.legend, lwd=1, ...)
+
+  ## trivariate
+  plot(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE, ...)
+
+  ## d-variate
+  plot(x, col, xmin, xmax, xlab, ylab, ...)
+}
+ The arguments are
+ \describe{
+  \item{\code{add.legend}}{flag for adding legend (2-d plot)}
+  \item{\code{pos.legend}}{(x,y) co-ordinates for legend (2-d plot)}
+  \item{\code{cex.legend}}{cex graphics parameter for legend (2-d plot)}
+  \item{\code{col}}{vector of plotting colours, one for each box}
+  \item{\code{xlab,ylab,zlab,xlim,ylim,zlim,add,lwd}}{usual graphics parameters}
+  \item{\code{xmin,xmax}}{vector of minimum and maximum axis plotting values for scatter
+    plot matrix}
+  \item{\code{color}}{vector of colours, one for each box (3-d plot)}
+  \item{\code{add.axis}}{flag for plotting axes (3-d plot)}
+} 
+
   Default colours are \code{topo.colors()}, with one colour per box in the
   PRIM box sequence.   
 }

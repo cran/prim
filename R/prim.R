@@ -680,7 +680,7 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
    add.legend=FALSE, cex.legend=1, pos.legend, lwd=1, ...)
 { 
   M <- x$num.hdr.class
-  
+
   ff <- function(x, d) { return (x[,d]) }
 
   if (missing(xlim))
@@ -706,14 +706,18 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
   }
 
   if (missing(col))
-    col <- topo.colors(M)
+  {  
+    col <- rep("transparent", M)
+    col[which(x$ind==1)] <- "orange"
+    col[which(x$ind==-1)] <- "blue"
+  }
+  
   if (length(col) < M)
     col <- rep(col, length=M)
     
   for (i in M:1)
   {
     ## colour i-th box
-    
     box <- x$box[[i]]
     rect(box[1,1], box[1,2], box[2,1], box[2,2], border=TRUE, col=col[i], lwd=lwd)
   }
@@ -732,7 +736,7 @@ plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=T
   require(misc3d)
   clear3d()
   rgl.bg(color="white")
-  
+
   M <- x$num.hdr.class
    
   ff <- function(x, d) { return (x[,d]) }
@@ -781,20 +785,25 @@ plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=T
 
 
 
-plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab,  x.pt, m, ...)
+plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, x.pt, m, ...)
 {
   M <- x$num.hdr.class
   d <- ncol(x$x)
   if (missing(col))
-    col <- c(topo.colors(M), "transparent")
-
+  {
+    ##col <- c(topo.colors(M), "transparent")
+    col <- rep("transparent", M)
+    col[which(x$ind==1)] <- "orange"
+    col[which(x$ind==-1)] <- "blue"
+  }
   if (missing(m) & !missing(x.pt)) m <- round(nrow(x.pt)/10)
   if (missing(x.pt))
   {
     x.pt <- numeric()
     for (j in 1:length(x$x))
       x.pt <- rbind(x.pt,x$x[[j]])
-    if (missing(m)) m <- round(nrow(x.pt)/10)
+    if (missing(m)) m <- max(round(nrow(x.pt)/10), nrow(x$x[[1]]))
+    
     x.pt <- x.pt[sample(1:nrow(x.pt), size=m),]
   }
 
@@ -827,25 +836,33 @@ summary.prim <- function(object, ..., print.box=FALSE)
   x <- object
   M <- x$num.class
 
-  summ.mat <- vector()
-  for (k in 1:M)
-    summ.mat <- rbind(summ.mat, c(x$y.mean[[k]], x$mass[[k]], x$ind[k]))
-
-  tot <- c(sum(summ.mat[,1]*summ.mat[,2])/sum(summ.mat[,2]), sum(summ.mat[,2]), NA)
-  summ.mat <- rbind(summ.mat, tot)
-  
-  rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
-  colnames(summ.mat) <- c("box-mean", "box-mass", "threshold.type")
-
-  if (x$num.hdr.class < x$num.class)
-    for (k in (x$num.hdr.class+1):x$num.class)
+  if (M>1)
+  {  
+    summ.mat <- vector()
+    for (k in 1:M)
+      summ.mat <- rbind(summ.mat, c(x$y.mean[[k]], x$mass[[k]], x$ind[k]))
+    
+    tot <- c(sum(summ.mat[,1]*summ.mat[,2])/sum(summ.mat[,2]), sum(summ.mat[,2]), NA)
+    summ.mat <- rbind(summ.mat, tot)
+    
+    rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
+    colnames(summ.mat) <- c("box-mean", "box-mass", "threshold.type")
+    
+    if (x$num.hdr.class < x$num.class)
+      for (k in (x$num.hdr.class+1):x$num.class)
       rownames(summ.mat)[k] <- paste(rownames(summ.mat)[k], "*",sep="")
-
+  }
+  else
+  {
+    summ.mat <- c(x$y.mean[[1]], x$mass[[1]])
+    tot <- c(x$y.mean[[1]], x$mass[[1]])
+    summ.mat <- rbind(summ.mat, tot)
+    rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
+    colnames(summ.mat) <- c("box-mean", "box-mass")
+  }
+  
   print(summ.mat)
   cat("\n")
-  
-  ##if (x$num.hdr.class < x$num.class)
-  ##  cat("\n* - box not in highest density region at level =", x$threshold,"\n\n")
   
   if (print.box)
   { 

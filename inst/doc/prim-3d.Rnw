@@ -130,22 +130,10 @@ summary(qflow.prim2)
 @ 
 In the plot below, the positive HDR is coloured orange, and the 
 negative HDR is coloured blue.  
-%%These 5-dimensional HDRs can be more or less distinct some 2-dimensional
-%%projections e.g. $(x_3, x_4)$ whereas in others they
-%%can overlap considerably e.g. $(x_1, x_2)$.
-%%We conclude that there are more HIV+ patients
-%%within the orange regions and more HIV-- patients within the blue regions. 
-%%The following plot is not exactly the output produced by the commands,
-%%but has been thinned for clarity.
-<<fig=FALSE>>=
-col <- c("blue", "orange")[(qflow.prim2$ind+3)/2]
-plot(qflow.prim2,  x.pt=rbind(xflowp[1:300,], xflown[1:300,]), col=col)
-@ 
 \setkeys{Gin}{width=0.45\textwidth}
 \begin{center}
-<<fig=TRUE,echo=FALSE,print=FALSE,results=hide>>=
-col <- c("blue", "orange")[(qflow.prim2$ind+3)/2]
-plot(qflow.prim2, x.pt=rbind(xflowp[1:300,], xflown[1:300,]), col=col)
+<<fig=TRUE,echo=TRUE,print=FALSE,results=hide>>=
+plot(qflow.prim2)
 @ 
 \end{center}
 
