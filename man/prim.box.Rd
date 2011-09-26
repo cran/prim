@@ -11,15 +11,16 @@
 \usage{
 prim.box(x, y, box.init=NULL, peel.alpha=0.05, paste.alpha=0.01,
      mass.min=0.05, threshold, pasting=TRUE, verbose=FALSE,
-     threshold.type=0)
+     threshold.type=0, y.fun=mean)
 
-prim.hdr(prim, threshold, threshold.type)
-prim.combine(prim1, prim2)
+prim.hdr(prim, threshold, threshold.type, y.fun=mean)
+prim.combine(prim1, prim2, y.fun=mean)
 }
 
 \arguments{
   \item{x}{matrix of data values}
   \item{y}{vector of response values}
+  \item{y.fun}{function applied to response y. Default is mean.}
   \item{box.init}{initial covering box}
   \item{peel.alpha}{peeling quantile tuning parameter}
   \item{paste.alpha}{pasting quantile tuning parameter}
@@ -134,5 +135,11 @@ summary(qf.prim2)
 plot(qf.prim1)   ## orange=x1>x2, blue x2<x1
 points(qf[qf.label==1,], cex=0.5)
 points(qf[qf.label==-1,], cex=0.5, col=2)
+
+## using median insted of mean for the response y
+
+qf.label2 <- quasiflow[1:1000,3]*quasiflow[1:1000,4]
+qf.prim3 <- prim.box(x=qf, y=qf.label2, threshold=c(0.3, -0.1), threshold.type=0) 
+qf.prim4 <- prim.box(x=qf, y=qf.label2, threshold=c(0.5, -0.2), threshold.type=0, y.fun=median)
 }
 \keyword{multivariate}

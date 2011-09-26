@@ -1,0 +1,14 @@
+58a355bbc22993551263c31b96524822 *DESCRIPTION
+eab71bf0c6a7f61b488d2047ee9685f1 *NAMESPACE
+57d7e48b24e0741fb8de83d6d5b4a793 *R/boxfun.R
+7cca15d4d5758c73a455fe81d728d0d3 *R/prim.R
+f99a63823cfb914549108c643447fe84 *data/quasiflow.RData
+fca122ba369a636e29e58afbf2472167 *inst/doc/prim-2d.Rnw
+e90f9e3ccd0f180b26c6bfaed0d66326 *inst/doc/prim-2d.pdf
+d8b4f749680c0064ed41c8158a78f729 *inst/doc/prim-3d.Rnw
+bdf23e7e0abbb9d54aa3aad8b12e5bbf *inst/doc/prim-3d.pdf
+3894ab49696fb90a7fe982e1b4f62e6f *man/plot.prim.Rd
+97fb607d4c27aec3efc59412b190573f *man/prim-internal.Rd
+040af9a60c6821034658eeda1de711d2 *man/prim-package.Rd
+6762afb3d1447adc54dfd7ccc7c7fb6d *man/prim.box.Rd
+1f0e89139816d193b94bcf7ac3e007fd *man/quasiflow.Rd

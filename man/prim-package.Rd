@@ -18,7 +18,6 @@ Patient Rule Induction Method (PRIM)
   scalar response. We wish to find the modal (and/or anti-modal) regions
   in the conditional 
   expectation \eqn{ m(\bold{x}) = \bold{E} (Y | \bold{x}).}{m(x) = E(Y | x).}  
-  %These regions are also known as the highest density regions (HDR).
   
   PRIM is a bump-hunting technique introduced by Friedman \& Fisher
   (1999), taken from data mining.
@@ -33,9 +32,6 @@ Tarn Duong <tarn.duong@gmail.com>
 }
 
 \references{
-  %Duong, T., Koch, I., \& Wand, M.P. (2007) A generalised chi-squared
-  %test for comparing sample from data rich sources: an example from flow
-  %cytometry. \emph{In preparation.}
   Friedman, J.H. & Fisher, N.I. (1999) Bump-hunting for high
   dimensional data, \emph{Statistics and Computing}, \bold{9}, 123--143.
 

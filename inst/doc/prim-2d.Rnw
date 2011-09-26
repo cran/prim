@@ -119,6 +119,26 @@ points(x[y>3.5,])
 There are many options for the graphical display. See
 the help guide for more details \texttt{?plot.prim}.
 
+The default function applied to the response variable \texttt{y} is
+\texttt{mean}. We can input another function, e.g. 
+median, using
+<<print=FALSE,results=hide>>=
+boston.prim.med <- prim.box(x=x, y=y, threshold.type=1, y.fun=median)
+@ 
+We compare the results 
+<<fig=FALSE>>=
+plot(boston.prim, col="transparent")
+plot(boston.prim.med, col="transparent", border="red", add=TRUE)
+@ 
+\setkeys{Gin}{width=0.45\textwidth}
+\begin{center}
+<<fig=TRUE,echo=FALSE>>=
+plot(boston.prim, col="transparent")
+plot(boston.prim.med, col="transparent", border="red", add=TRUE)
+legend("topleft", legend=c("mean", "median"), col=1:2, lty=1, bty="n")
+@
+\end{center}
+
 We attempt PRIM with categorical variables. We replace 
 the average number of rooms per dwelling (\texttt{rm})
 with the index of accessibility to radial highways (\texttt{rad})
@@ -138,6 +158,8 @@ plot(boston.cat.prim, col="transparent")
 points(x2[y>3.5,])
 @
 \end{center}
+
+
 
 \bibliographystyle{apalike}
 
