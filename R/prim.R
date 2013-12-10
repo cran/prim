@@ -374,7 +374,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold, d,
   
   if ((y.fun.val >= threshold) & (mass >= mass.min))
     boxk.peel <- peel.one(x=x, y=y, box=box, peel.alpha=peel.alpha,
-                          mass.min=mass.min,threshold=threshold, d=d, n=n, y.fun=y.fun)   
+                          mass.min=mass.min,threshold=threshold, d=d, n=n, y.fun=y.fun, verbose=verbose)   
   else
     boxk.peel <- NULL
 
@@ -385,7 +385,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold, d,
     boxk.temp <- boxk.peel
     boxk.peel <- peel.one(x=boxk.temp$x, y=boxk.temp$y, box=boxk.temp$box,
                           peel.alpha=peel.alpha,
-                          mass.min=mass.min, threshold=threshold, d=d, n=n, y.fun=y.fun)
+                          mass.min=mass.min, threshold=threshold, d=d, n=n, y.fun=y.fun, verbose=verbose)
   }
   
   if (verbose)
@@ -400,7 +400,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold, d,
       boxk.temp <- boxk.paste
       boxk.paste <- paste.one(x=boxk.temp$x, y=boxk.temp$y, box=boxk.temp$box,
                               x.init=x, y.init=y, paste.alpha=paste.alpha,
-                              mass.min=mass.min, threshold=threshold, d=d, n=n, y.fun=y.fun)      
+                              mass.min=mass.min, threshold=threshold, d=d, n=n, y.fun=y.fun, verbose=verbose)      
     }
     if (verbose)
       cat("Pasting completed\n")  
@@ -435,7 +435,7 @@ find.box <- function(x, y, box, peel.alpha, paste.alpha, mass.min, threshold, d,
 ## mass - box mass
 ###############################################################################
 
-peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=8, y.fun=mean)
+peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=8, y.fun=mean, verbose)
 {
   box.new <- box
   mass <- length(y)/n
@@ -497,7 +497,8 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=8, y
     box.new[2,j.max] <- quantile(x[,j.max], 1-peel.alpha, type=type)
     x.index <- x[,j.max] <= box.new[2,j.max]
   }
- 
+
+  if (verbose) cat("Peeled in dimension", j.max, ": new limits are",  paste("[", signif(box.new[1,j.max],4), ",", signif(box.new[2,j.max],4) , "]\n", sep=""))
   x.new <- x[x.index,]
   y.new <- y[x.index]
   mass.new <- length(y.new)/n
@@ -537,7 +538,7 @@ peel.one <- function(x, y, box, peel.alpha, mass.min, threshold, d, n, type=8, y
 ## box.mass - box mass
 ###############################################################################
 
-paste.one <- function(x, y, x.init, y.init, box, paste.alpha, mass.min, threshold, d, n, y.fun=mean)
+paste.one <- function(x, y, x.init, y.init, box, paste.alpha, mass.min, threshold, d, n, y.fun=mean, verbose)
 {
   box.new <- box
   mass <- length(y)/n
@@ -637,7 +638,8 @@ paste.one <- function(x, y, x.init, y.init, box, paste.alpha, mass.min, threshol
      y.new <- y.paste2.list[[j.max]]
      box.new[2,j.max] <- box.paste[2,j.max]
   }
-  
+
+  if (verbose) cat("Pasted in dimension", j.max, ": new limits are",  paste("[", signif(box.new[1,j.max],4), ",", signif(box.new[2,j.max],4) , "]\n", sep=""))
   mass.new <- length(y.new)/n
   y.fun.new <- do.call(y.fun, list(x=y.new))
 
@@ -876,4 +878,22 @@ summary.prim <- function(object, ..., print.box=FALSE)
 }
 
 
+predict.prim <- function(object, newdata, y.fun.flag=FALSE, ...)
+{
+  x <- newdata
+  prim.obj <- object 
+  which.box <- prim.which.box(x=x, box.seq=prim.obj)
+
+  if (y.fun.flag)
+  {
+    lab <- rep(tail(prim.obj$y.fun, n=1), length(which.box))
+    lab[which.box>0] <- prim.obj$y.fun[which.box[which.box>0]]
+  }
+  else
+  {
+    lab <- which.box
+  }
+
+  return(lab)
+}
 

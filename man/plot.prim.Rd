@@ -54,10 +54,10 @@ The function headers are
 }
  
 
-\seealso{\code{\link{prim.box}}}
+\seealso{\code{\link{prim.box}}, \code{\link{predict.prim}}}
 
 \examples{
-## see ?prim.box
+## see ?predict.prim
 }
 
 \keyword{ hplot}

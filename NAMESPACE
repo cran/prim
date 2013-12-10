@@ -9,6 +9,7 @@ export(prim.which.box)
 
 
 S3method(plot, prim)
+S3method(predict, prim)
 S3method(summary, prim)
 
              

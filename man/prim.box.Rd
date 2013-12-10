@@ -3,7 +3,6 @@
 \alias{prim.hdr}
 \alias{prim.combine}
 
-
 \title{PRIM for multivariate data}
 \description{
   PRIM for multivariate data.
@@ -129,17 +128,8 @@ qf.primp.hdr <- prim.hdr(prim=qf.primp, threshold=0.25, threshold.type=1)
 qf.primn <- prim.box(x=qf, y=qf.label, threshold=-0.3, threshold.type=-1)
 qf.prim2 <- prim.combine(qf.primp.hdr, qf.primn)
 
-summary(qf.prim1)
-summary(qf.prim2) 
-
 plot(qf.prim1)   ## orange=x1>x2, blue x2<x1
 points(qf[qf.label==1,], cex=0.5)
 points(qf[qf.label==-1,], cex=0.5, col=2)
-
-## using median insted of mean for the response y
-
-qf.label2 <- quasiflow[1:1000,3]*quasiflow[1:1000,4]
-qf.prim3 <- prim.box(x=qf, y=qf.label2, threshold=c(0.3, -0.1), threshold.type=0) 
-qf.prim4 <- prim.box(x=qf, y=qf.label2, threshold=c(0.5, -0.2), threshold.type=0, y.fun=median)
 }
 \keyword{multivariate}
