@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-\usepackage{natbib,amsmath,amsopn,amssymb,titling}
+\usepackage{natbib,amsmath,amsopn,amssymb}
 \usepackage[left=2.5cm,top=2.5cm,right=2.5cm,bottom=2.5cm]{geometry}
 
 \renewcommand{\today}{\begingroup
@@ -34,7 +34,6 @@ November\or December\fi
 %\SweaveOpts{eps=FALSE,pdf=FALSE}
 \begin{document}
 
-\setlength{\droptitle}{-2em}
 \maketitle
 
 %\section{Introduction}
@@ -84,7 +83,7 @@ pairs(xflown[1:300,])
 
 \setkeys{Gin}{width=0.45\textwidth}
 \begin{center}
-\begin{tabular}{cc}
+\begin{tabular}{@{}c@{}c@{}}
 HIV+ & HIV-- \\
 <<fig=TRUE,echo=FALSE,print=FALSE,results=hide>>=
 pairs(xflowp[1:300,])

@@ -1,6 +1,6 @@
 Package: prim
-Version: 1.0.13
-Date: 2013/12/10
+Version: 1.0.14
+Date: 2014/06/13
 Title: Patient Rule Induction Method (PRIM)
 Author: Tarn Duong <tarn.duong@gmail.com> 
 Maintainer: Tarn Duong <tarn.duong@gmail.com>
@@ -9,7 +9,7 @@ Suggests: rgl (>= 0.66), misc3d (>= 0.4-0), MASS
 Description: PRIM for bump hunting in high-dimensional data
 License: GPL-2 | GPL-3
 URL: http://www.mvstat.net/tduong
-Packaged: 2013-12-10 11:17:12 UTC; duongt
+Packaged: 2014-06-13 15:52:20 UTC; duongt
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-12-10 12:34:48
+Date/Publication: 2014-06-13 18:18:29
