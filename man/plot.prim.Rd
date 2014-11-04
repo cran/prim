@@ -11,7 +11,7 @@
 }
 
 \arguments{
-  \item{x}{an object of class \code{prim}}
+  \item{x}{object of class \code{prim}}
   \item{splom}{flag for plotting 3-d data as scatter plot matrix. Default is TRUE.}
   \item{...}{other graphics parameters}
 }
@@ -57,7 +57,14 @@ The function headers are
 \seealso{\code{\link{prim.box}}, \code{\link{predict.prim}}}
 
 \examples{
-## see ?predict.prim
+## see ?predict.prim for bivariate example
+## trivariate example
+data(quasiflow)
+qf <- quasiflow[1:1000,1:3]
+qf.label <- quasiflow[1:1000,4]
+thr <- c(0.25, -0.3)
+qf.prim <- prim.box(x=qf, y=qf.label, threshold=thr, threshold.type=0)
+plot(qf.prim)
 }
 
 \keyword{ hplot}

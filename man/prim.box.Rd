@@ -63,11 +63,11 @@ prim.combine(prim1, prim2, y.fun=mean)
   The type of PRIM estimate is controlled \code{threshold} and
   \code{threshold.type}:
   \itemize{
-    \item{}{For \code{threshold.type=1}, we search for \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold}\}.}
+    \item{}{\code{threshold.type=1}, search for \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold}\}.}
     
-    \item{}{For \code{threshold.type=-1}, we search for \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold}\}.}
+    \item{}{\code{threshold.type=-1}, search for \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold}\}.}
       
-    \item{}{For \code{threshold.type=0}, we search for both \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold[1]}\} and \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold[2]}\}.}
+    \item{}{\code{threshold.type=0}, search for both \{\eqn{m(\bold{x}) \geq}{m(x) >=} \code{threshold[1]}\} and \{\eqn{m(\bold{x}) \leq}{m(x) <=} \code{threshold[2]}\}.}
   }
 
   There are two ways of using PRIM. One is \code{prim.box} with

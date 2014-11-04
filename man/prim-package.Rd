@@ -18,9 +18,9 @@ Patient Rule Induction Method (PRIM)
   in the conditional 
   expectation \eqn{ m(\bold{x}) = \bold{E} (Y | \bold{x}).}{m(x) = E(Y | x).}  
   
-  PRIM is a bump-hunting technique introduced by Friedman \& Fisher
-  (1999), taken from data mining.
-  PRIM estimates are a sequence of nested hyper-rectangles (boxes).
+  PRIM is a bump-hunting technique introduced by Friedman & Fisher
+  (1999), taken from data mining. PRIM estimates are a sequence of
+  nested hyper-rectangles (boxes). 
  
   For an overview of this package, see \code{vignette("prim")} for PRIM
   estimation for 2- and 5-dimensional data. 
@@ -35,7 +35,7 @@ Tarn Duong <tarn.duong@gmail.com>
   dimensional data, \emph{Statistics and Computing}, \bold{9}, 123--143.
 
   Hyndman, R.J.  Computing and graphing highest density
-  regions. \emph{The American Statistician}, \bold{50}, 120--126. 
+  regions. \emph{American Statistician}, \bold{50}, 120--126. 
 }
 
 

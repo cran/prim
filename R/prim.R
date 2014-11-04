@@ -666,7 +666,7 @@ plot.prim <- function(x, splom=TRUE, ...)
   if (ncol(x$x[[1]])==2)
     plotprim.2d(x, ...)
   else if (ncol(x$x[[1]])==3 & !splom)
-  {  warning("RGL 3-d plotting temporarily disabled") 
+  {  ##warning("RGL 3-d plotting temporarily disabled") 
      plotprim.3d(x, ...)
    }
   else if (ncol(x$x[[1]])>3 | (ncol(x$x[[1]])==3 & splom))
@@ -732,10 +732,10 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
 
 plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE, size=3, ...)
 {
-  require(rgl)
-  require(misc3d)
-  clear3d()
-  rgl.bg(color="white")
+  ##require(rgl)
+  ##require(misc3d)
+  ##clear3d()
+  ##rgl.bg(color="white")
 
   M <- x$num.hdr.class
    

@@ -12,9 +12,9 @@
 }
 
 \arguments{
-  \item{object}{objects of type \code{prim}}
+  \item{object}{object of class \code{prim}}
   \item{newdata}{data matrix}
-  \item{y.fun.flag}{flag to return y value ox PRIM box rather than PRIM
+  \item{y.fun.flag}{flag to return y value of PRIM box rather than 
     box label. Default is FALSE.}
   \item{print.box}{flag to print out limits of all PRIM boxes. Default
   is FALSE.} 
