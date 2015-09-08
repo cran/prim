@@ -1,4 +1,12 @@
 
+import(grDevices)
+import(graphics)
+import(misc3d)
+import(rgl)
+import(stats)
+import(tcltk)
+import(utils)
+
 export(counts.box)
 export(in.box)
 export(prim.box)
@@ -7,12 +15,9 @@ export(prim.hdr)
 #export(prim.thresh.mixt.dd)
 export(prim.which.box)
 
-
 S3method(plot, prim)
 S3method(predict, prim)
 S3method(summary, prim)
 
-import(misc3d)
-import(rgl)
 
              
