@@ -837,28 +837,28 @@ summary.prim <- function(object, ..., print.box=FALSE)
   M <- x$num.class
 
   if (M>1)
-  {  
-    summ.mat <- vector()
-    for (k in 1:M)
-      summ.mat <- rbind(summ.mat, c(x$y.fun[[k]], x$mass[[k]], x$ind[k]))
-    
-    tot <- c(sum(summ.mat[,1]*summ.mat[,2])/sum(summ.mat[,2]), sum(summ.mat[,2]), NA)
-    summ.mat <- rbind(summ.mat, tot)
-    
+  {
+      x2 <- lapply(lapply(x[c("y.fun","mass", "ind")], head, n=M-1), unlist)
+      summ.mat <- data.frame(y.fun=x2$y.fun, mass=x2$mass, ind=x2$ind) 
+      summ.mat <- rbind(summ.mat, c(x$y.fun[[M]], x$mass[[M]], NA))
+      
+      tot <- c(sum(summ.mat[,1]*summ.mat[,2])/sum(summ.mat[,2]), sum(summ.mat[,2]), NA)
+      summ.mat <- rbind(summ.mat, tot)
+      
     rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
-    colnames(summ.mat) <- c("box-fun", "box-mass", "threshold.type")
-    
-    if (x$num.hdr.class < x$num.class)
-      for (k in (x$num.hdr.class+1):x$num.class)
-      rownames(summ.mat)[k] <- paste(rownames(summ.mat)[k], "*",sep="")
+      colnames(summ.mat) <- c("box-fun", "box-mass", "threshold.type")
+      
+      if (x$num.hdr.class < x$num.class)
+          for (k in (x$num.hdr.class+1):x$num.class)
+              rownames(summ.mat)[k] <- paste(rownames(summ.mat)[k], "*",sep="")
   }
   else
   {
-    summ.mat <- c(x$y.fun[[1]], x$mass[[1]])
-    tot <- c(x$y.fun[[1]], x$mass[[1]])
-    summ.mat <- rbind(summ.mat, tot)
-    rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
-    colnames(summ.mat) <- c("box-fun", "box-mass")
+      summ.mat <- c(x$y.fun[[1]], x$mass[[1]])
+      tot <- c(x$y.fun[[1]], x$mass[[1]])
+      summ.mat <- rbind(summ.mat, tot)
+      rownames(summ.mat) <- c(paste("box", 1:(nrow(summ.mat)-1), sep=""), "overall")
+      colnames(summ.mat) <- c("box-fun", "box-mass")
   }
   
   print(summ.mat)
