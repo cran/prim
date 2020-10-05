@@ -128,7 +128,7 @@ qf.primp.hdr <- prim.hdr(prim=qf.primp, threshold=0.25, threshold.type=1)
 qf.primn <- prim.box(x=qf, y=qf.label, threshold=-0.3, threshold.type=-1)
 qf.prim2 <- prim.combine(qf.primp.hdr, qf.primn)
 
-plot(qf.prim1)   ## orange=x1>x2, blue x2<x1
+plot(qf.prim1, alpha=0.2)   ## orange=x1>x2, blue x2<x1
 points(qf[qf.label==1,], cex=0.5)
 points(qf[qf.label==-1,], cex=0.5, col=2)
 }

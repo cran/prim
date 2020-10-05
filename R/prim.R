@@ -675,8 +675,7 @@ plot.prim <- function(x, splom=TRUE, ...)
   invisible()
 }
 
-plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
-   add.legend=FALSE, cex.legend=1, pos.legend, lwd=1, border, ...)
+plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,  add.legend=FALSE, cex.legend=1, pos.legend, lwd=1, border, col.vec=c("blue", "orange"), alpha=1, ...)
 { 
   M <- x$num.hdr.class
 
@@ -707,8 +706,8 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,
   if (missing(col))
   {  
     col <- rep("transparent", M)
-    col[which(x$ind==1)] <- "orange"
-    col[which(x$ind==-1)] <- "blue"
+    col[which(x$ind==1)] <- scales::alpha(col.vec[2], alpha=alpha)
+    col[which(x$ind==-1)] <- scales::alpha(col.vec[1], alpha=alpha)
   }
 
   if (missing(border)) border <- rep(1, M)
@@ -785,16 +784,15 @@ plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=T
 
 
 
-plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, x.pt, m, ...)
+plotprim.nd  <- function(x, col, xmin, xmax, xlab, ylab, x.pt, m, col.vec=c("blue","orange"), alpha=1, ...)
 {
   M <- x$num.hdr.class
   d <- ncol(x$x)
   if (missing(col))
   {
-    ##col <- c(topo.colors(M), "transparent")
     col <- rep("transparent", M)
-    col[which(x$ind==1)] <- "orange"
-    col[which(x$ind==-1)] <- "blue"
+    col[which(x$ind==1)] <- scales::alpha(col.vec[2], alpha=alpha)
+    col[which(x$ind==-1)] <- scales::alpha(col.vec[1], alpha=alpha)
   }
   if (missing(m) & !missing(x.pt)) m <- round(nrow(x.pt)/10)
   if (missing(x.pt))
