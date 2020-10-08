@@ -20,7 +20,7 @@ The Patient Rule Induction Method (PRIM) was introduced by Friedman and Fisher (
 
 *m(**x**) = **E** (Y | **X** = **x**)*.
 
-In the case where we have 2 samples, we can label the response as a binary variable where 
+In the case where we have 2 samples, we can label the response as a binary variable with 
 
 *Y~i~ = 1* if ***X**~i~* is in sample 1
 
@@ -40,7 +40,6 @@ yflow <- quasiflow[,4]
 xflow <- quasiflow[,1:3]
 xflowp <- quasiflow[yflow==1,1:3]
 xflown <- quasiflow[yflow==-1,1:3]
-par(bg="cyan")
 ```
 
 We can think of `xflowp` as flow cytometric measurements from an HIV+ patient, and `xflown` from an HIV-- patient.
@@ -56,7 +55,7 @@ qflow.thr <- c(0.38, -0.23)
 qflow.prim <- prim.box(x=xflow, y=yflow, threshold=qflow.thr, threshold.type=0)
 ```
 
-An alternative is compute PRIM box sequences which cover the entire data range, and then use `prim.hdr` to experiment with different threshold values. This two-step process is more efficient and faster than calling `prim.box` for each different threshold. We are happy with the positive HDR threshold so we can compute the positive HDR directly: 
+An alternative is compute PRIM box sequences which cover the range of the response variable `y`, and then use `prim.hdr` to experiment with different threshold values. This two-step process is more efficient and faster than calling `prim.box` for each different threshold. We are happy with the positive HDR threshold so we can compute the positive HDR directly: 
 ``` {r}
 qflow.hdr.pos <- prim.box(x=xflow, y=yflow, threshold=0.38, threshold.type=1)
 summary(qflow.hdr.pos)

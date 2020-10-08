@@ -9,13 +9,11 @@ data(Boston)
 x <- Boston[,5:6]
 y <- Boston[,1]
 boston.prim <- prim.box(x=x, y=y, threshold.type=1)
-par(bg='cyan')
 
 ## -----------------------------------------------------------------------------
 summary(boston.prim, print.box=TRUE)
 
 ## ---- fig.asp=1---------------------------------------------------------------
-par(mar=c(4.1, 4.1, 0.1, 0.1))
 plot(boston.prim, col="transparent")
 points(x[y>3.5,])
 

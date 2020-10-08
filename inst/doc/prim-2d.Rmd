@@ -1,7 +1,7 @@
 ---
 title: "Using prim for bump hunting"
 output: rmarkdown::html_vignette
-description: Blah
+description: Using prim for bump hunting
 date: "`r format(Sys.time(), '%d %B %Y')`"
 author: Tarn Duong https://mvstat.net/tduong/
 vignette: >
@@ -30,7 +30,6 @@ data(Boston)
 x <- Boston[,5:6]
 y <- Boston[,1]
 boston.prim <- prim.box(x=x, y=y, threshold.type=1)
-par(bg='cyan')
 ```
 The default settings for `prim.box` are
 
@@ -52,7 +51,6 @@ summary(boston.prim, print.box=TRUE)
 
 We plot the PRIM boxes, including all those towns whose crime rate exceeds 3.5. Thus verifying that the majority of high crime towns fall inside thebump.
 ```{r, fig.asp=1}
-par(mar=c(4.1, 4.1, 0.1, 0.1))
 plot(boston.prim, col="transparent")
 points(x[y>3.5,])
 ```
@@ -71,7 +69,7 @@ plot(boston.prim.med, col="transparent", border="red", add=TRUE)
 legend("topleft", legend=c("mean", "median"), col=1:2, lty=1, bty="n")
 ```
 
-We attempt PRIM with categorical variables, so we replace the average number of rooms per dwelling `rm` with the index of accessibility to radial highways `rad` which takes integral values from 1 to 24 inclusive.
+The covariate `x` can also include categorical variables: we replace the average number of rooms per dwelling `rm` with the index of accessibility to radial highways `rad` which takes integral values from 1 to 24 inclusive.
 ```{r, fig.asp=1}
 x2 <- Boston[,c(5,9)]  
 y <- Boston[,1]  

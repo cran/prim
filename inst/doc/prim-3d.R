@@ -9,7 +9,6 @@ yflow <- quasiflow[,4]
 xflow <- quasiflow[,1:3]
 xflowp <- quasiflow[yflow==1,1:3]
 xflown <- quasiflow[yflow==-1,1:3]
-par(bg="cyan")
 
 ## -----------------------------------------------------------------------------
 pairs(xflowp, cex=0.5, pch=16, col=grey(0,0.1), xlim=c(0,1), ylim=c(0,1))
