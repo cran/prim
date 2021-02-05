@@ -15,7 +15,7 @@
 
 \usage{data(quasiflow)}
 
-\format{\code{quasflow} is a matrix with 6 columns and 20000 rows.
+\format{\code{quasiflow} is a matrix with 6 columns and 20000 rows.
   Each row corresponds to measurements for one cell.
   The first 5 columns are flow cytometric measurements and the sixth
   column is a binary indicator, with 1 = HIV+ and -1 = HIV-.

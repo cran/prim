@@ -1,17 +1,17 @@
 Package: prim
-Version: 1.0.19
-Date: 2020-10-08
+Version: 1.0.20
+Date: 2021-02-05
 Title: Patient Rule Induction Method (PRIM)
 Author: Tarn Duong <tarn.duong@gmail.com> 
 Maintainer: Tarn Duong <tarn.duong@gmail.com>
 Depends: R (>= 2.10.0)
-Imports: grDevices, graphics, misc3d, rgl, scales, stats, tcltk, utils
+Imports: scales, tcltk, plot3D
 Suggests: knitr, rmarkdown, MASS
 VignetteBuilder: knitr
 Description: Patient Rule Induction Method (PRIM) for bump hunting in high-dimensional data.
 License: GPL-2 | GPL-3
 URL: https://www.mvstat.net/tduong/
 NeedsCompilation: no
-Packaged: 2020-10-08 12:04:29 UTC; tduong
+Packaged: 2021-02-05 01:34:23 UTC; tduong
 Repository: CRAN
-Date/Publication: 2020-10-08 13:30:03 UTC
+Date/Publication: 2021-02-05 05:50:03 UTC

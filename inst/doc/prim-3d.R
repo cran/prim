@@ -34,3 +34,6 @@ summary(qflow.prim2)
 ## ---- fig.asp=1, fig.height=10------------------------------------------------
 plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1)
 
+## ---- fig.asp=1, fig.height=10------------------------------------------------
+plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1, splom=FALSE, colkey=FALSE, ticktype="detailed")
+

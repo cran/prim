@@ -666,9 +666,9 @@ plot.prim <- function(x, splom=TRUE, ...)
   if (ncol(x$x[[1]])==2)
     plotprim.2d(x, ...)
   else if (ncol(x$x[[1]])==3 & !splom)
-  {  ##warning("RGL 3-d plotting temporarily disabled") 
+  {  
      plotprim.3d(x, ...)
-   }
+  }
   else if (ncol(x$x[[1]])>3 | (ncol(x$x[[1]])==3 & splom))
     plotprim.nd(x, ...)
   
@@ -722,63 +722,36 @@ plotprim.2d <- function(x, col, xlim, ylim, xlab, ylab, add=FALSE,  add.legend=F
   }
   
   if (add.legend)
-    legend(pos.legend[1], pos.legend[2], legend=text.legend, fill=col, bty="n",
-           cex=cex.legend)
+    legend(pos.legend[1], pos.legend[2], legend=text.legend, fill=col, bty="n", cex=cex.legend)
   
   invisible()
 }
 
 
-plotprim.3d <- function(x, color, xlim, ylim, zlim, xlab, ylab, zlab, add.axis=TRUE, size=3, ...)
+plotprim.3d <- function(x, col, xlim, ylim, zlim, xlab, ylab, zlab, col.vec=c("blue","orange"), alpha=1, theta=30, phi=40, d=4, ...)
 {
-  ##require(rgl)
-  ##require(misc3d)
-  ##clear3d()
-  ##rgl.bg(color="white")
-
   M <- x$num.hdr.class
-   
-  ff <- function(x, d) { return (x[,d]) }
-   
-  if (missing(xlim))
-    xlim <- range(sapply(x$box, ff, 1))
-  if (missing(ylim))
-    ylim <- range(sapply(x$box, ff, 2))
-  if (missing(zlim))
-    zlim <- range(sapply(x$box, ff, 3))
-
-  x.names <- colnames(x$x[[1]])
-  if (is.null(x.names)) x.names <- c("x","y","z")
-  
-  if (missing(xlab)) xlab <- x.names[1]
-  if (missing(ylab)) ylab <- x.names[2] 
-  if (missing(zlab)) zlab <- x.names[3]
-
-  if (add.axis)
+  if (missing(col))
   {
-    lines3d(xlim[1:2], rep(ylim[1],2), rep(zlim[1],2), size=3, color="black")
-    lines3d(rep(xlim[1],2), ylim[1:2], rep(zlim[1],2), size=3, color="black")
-    lines3d(rep(xlim[1],2), rep(ylim[1],2), zlim[1:2], size=3, color="black")
-  
-    texts3d(xlim[2],ylim[1],zlim[1],xlab,size=3,color="black", adj=0)
-    texts3d(xlim[1],ylim[2],zlim[1],ylab,size=3,color="black", adj=1)
-    texts3d(xlim[1],ylim[1],zlim[2],zlab,size=3,color="black", adj=1)
+    col <- rep("transparent", M)
+    col[which(x$ind==1)] <- scales::alpha(col.vec[2], alpha=alpha)
+    col[which(x$ind==-1)] <- scales::alpha(col.vec[1], alpha=alpha)
   }
   
-  if (missing(color))
-    color <- topo.colors(M)
-  if (length(color) < M)
-    color <- rep(color, length=M)
+  if (missing(xlab)) xlab <- names(x$x[[1]])[1]
+  if (missing(ylab)) ylab <- names(x$x[[1]])[2]
+  if (missing(zlab)) zlab <- names(x$x[[1]])[3]
   
-  for (i in M:1)
-  {
-    ## colour data in i-th box
-    xdata <- x$x[[i]]
-    if (is.vector(xdata))
-      points3d(xdata[1], xdata[2], xdata[3], color=color[i], size=size)
-    else
-      points3d(xdata[,1], xdata[,2], xdata[,3], color=color[i], size=size)
-  }
+  xdata <- numeric() 
+  for (i in M:1) xdata <- rbind(xdata, x$x[[i]])
+  
+  xprim <- prim.which.box(xdata, box.seq=x)
+  xprim.ord <- order(xprim)
+  xdata <- xdata[xprim.ord,]
+  xprim.col <- col[xprim][xprim.ord]
+  
+  plot3D::points3D(xdata[,1], xdata[,2], xdata[,3], col=xprim.col, theta=theta, phi=phi, d=d, xlab=xlab, ylab=ylab, zlab=zlab, ...)
+  
   invisible()
 }
 

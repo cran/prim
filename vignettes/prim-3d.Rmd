@@ -80,10 +80,16 @@ qflow.prim2 <- prim.combine(qflow.hdr.pos, qflow.hdr.neg1)
 summary(qflow.prim2)
 ```
 
-In the plot below, the positive HDR is coloured orange (where the HIV+ sample is more prevalent), and the  negative HDR is coloured blue (where the HIV- sample is more prevalent).  
+In the plot below, the positive HDR is coloured orange (where the HIV+ sample is more prevalent), and the  negative HDR is coloured blue (where the HIV- sample is more prevalent)  
 ```{r, fig.asp=1, fig.height=10}
 plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1)
 ```
+
+or equivalently as a 3D scatter plot. 
+```{r, fig.asp=1, fig.height=10}
+plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1, splom=FALSE, colkey=FALSE, ticktype="detailed")
+```
+
 
 ## References
 
