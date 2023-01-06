@@ -57,7 +57,7 @@ prim.combine(prim1, prim2, y.fun=mean)
   either the box mean is smaller than \code{threshold} or the box mass
   is less than \code{mass.min}.  Pasting is optional, and is used to correct any
   possible over-peeling. The default values for \code{peel.alpha},
-  \code{paste.alpha} and \code{mass.min} are taken from Friedman \&
+  \code{paste.alpha} and \code{mass.min} are taken from Friedman &
   Fisher (1999).
 
   The type of PRIM estimate is controlled \code{threshold} and

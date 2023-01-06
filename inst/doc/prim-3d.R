@@ -1,5 +1,5 @@
 ## ---- echo=FALSE, message=FALSE-----------------------------------------------
-knitr::opts_chunk$set(collapse=TRUE, comment="#>", fig.width=5, fig.height=5, fig.align="center", global.par=TRUE) 
+knitr::opts_chunk$set(collapse=TRUE, comment="#>", fig.width=5, fig.height=5, fig.align="center", global.par=TRUE, dpi=96) 
 options(tibble.print_min=4L, tibble.print_max=4L)
 
 ## -----------------------------------------------------------------------------

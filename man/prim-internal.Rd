@@ -9,5 +9,6 @@
 These functions are user-level but which the user is not required to use directly.
 }
 
+\value{The user is not required to use directly these outputs.}
 
 \keyword{internal}
