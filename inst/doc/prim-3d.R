@@ -1,4 +1,4 @@
-## ---- echo=FALSE, message=FALSE-----------------------------------------------
+## ----echo=FALSE, message=FALSE------------------------------------------------
 knitr::opts_chunk$set(collapse=TRUE, comment="#>", fig.width=5, fig.height=5, fig.align="center", global.par=TRUE, dpi=96) 
 options(tibble.print_min=4L, tibble.print_max=4L)
 
@@ -31,9 +31,9 @@ summary(qflow.hdr.neg1)
 qflow.prim2 <- prim.combine(qflow.hdr.pos, qflow.hdr.neg1)
 summary(qflow.prim2)
 
-## ---- fig.asp=1, fig.height=10------------------------------------------------
+## ----fig.asp=1, fig.height=10-------------------------------------------------
 plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1)
 
-## ---- fig.asp=1, fig.height=10------------------------------------------------
+## ----fig.asp=1, fig.height=10-------------------------------------------------
 plot(qflow.prim2, x.pt=xflow, pch=16, cex=0.5, alpha=0.1, splom=FALSE, colkey=FALSE, ticktype="detailed")
 

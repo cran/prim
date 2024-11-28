@@ -1,5 +1,6 @@
 \name{prim-package}
 \alias{prim} 
+\alias{prim-package}
 \docType{package}
 
 \title{
